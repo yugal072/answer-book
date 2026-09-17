@@ -2,13 +2,22 @@ from app.answer_generation.generator import generate_answer
 
 
 def test_numerical_answer_structure():
-    result = generate_answer(
-        "Calculate the resistance of 6 ohm and 12 ohm resistors in parallel.",
-        "numerical",
-    )
+    question = {
+        "number": "3(b)",
+        "section": "B",
+        "text": "Calculate the resistance of 6 ohm and 12 ohm resistors in parallel.",
+        "marks": 3,
+        "type": "numerical",
+        "options": None,
+        "has_figure": False,
+        "page": 2,
+        "choice_group": None,
+    }
 
-    assert result["question"]
-    assert "answer" in result
+    result = generate_answer(question)
+
+    assert result["question_number"] == "3(b)"
+    assert result["answer"]
     assert "steps" in result
     assert "mark_split" in result
     assert "common_mistakes" in result
