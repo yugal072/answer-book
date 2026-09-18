@@ -4,11 +4,17 @@ from app.answer_generation.schema import GeneratedSolution
 from app.llm.gemini import GeminiProvider
 
 
-def generate_answer(question: dict[str, Any]) -> dict[str, Any]:
+def generate_answer(
+    question: dict[str, Any],
+    retry_reason: str | None = None,
+) -> dict[str, Any]:
     """
     Generate a candidate solution for one structured question.
 
     Verification is intentionally not performed here.
+
+    If retry_reason is provided, it is included in the prompt so
+    the LLM can correct the previous failed solution.
     """
 
     question_number = question.get("number", "")
@@ -34,6 +40,16 @@ Question:
         prompt += f"""
 Options:
 {options}
+"""
+
+    if retry_reason:
+        prompt += f"""
+Previous solution failed verification.
+
+Reason:
+{retry_reason}
+
+Generate a corrected solution.
 """
 
     prompt += """

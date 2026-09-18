@@ -3,14 +3,42 @@ from app.verification.verifier import verify_solution
 from app.graph.state import SolveState
 
 
-def generate_node(state: SolveState) -> SolveState:
+def route_node(state: SolveState) -> SolveState:
     """
-    Generate a candidate solution for the current question.
+    Identify the question type and store the selected route.
     """
 
     question = state["question"]
+    question_type = question.get("type", "").lower()
 
-    solution = generate_answer(question)
+    supported_types = {
+        "mcq",
+        "numerical",
+        "short",
+        "long",
+        "diagram",
+    }
+
+    if question_type not in supported_types:
+        route = "unsupported"
+    else:
+        route = question_type
+
+    return {
+        **state,
+        "route": route,
+    }
+
+
+def generate_node(state: SolveState) -> SolveState:
+    question = state["question"]
+
+    retry_reason = state.get("retry_reason")
+
+    solution = generate_answer(
+        question,
+        retry_reason=retry_reason,
+    )
 
     return {
         **state,
@@ -19,14 +47,13 @@ def generate_node(state: SolveState) -> SolveState:
 
 
 def verify_node(state: SolveState) -> SolveState:
-    """
-    Verify the generated solution.
-    """
-
     question = state["question"]
     solution = state["solution"]
 
-    verification = verify_solution(question, solution)
+    verification = verify_solution(
+        question,
+        solution,
+    )
 
     return {
         **state,
@@ -41,7 +68,6 @@ def retry_node(state: SolveState) -> SolveState:
     """
 
     retry_count = state.get("retry_count", 0)
-
     verification = state.get("verification", {})
 
     return {

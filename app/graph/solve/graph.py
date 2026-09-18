@@ -1,6 +1,11 @@
 from langgraph.graph import END, START, StateGraph
 
-from app.graph.solve.nodes import generate_node, verify_node, retry_node
+from app.graph.solve.nodes import (
+    generate_node,
+    retry_node,
+    route_node,
+    verify_node,
+)
 from app.graph.state import SolveState
 
 
@@ -8,11 +13,6 @@ MAX_RETRIES = 2
 
 
 def route_after_verify(state: SolveState) -> str:
-    """
-    Decide whether the solution passed verification
-    or needs another generation attempt.
-    """
-
     verification = state.get("verification", {})
     retry_count = state.get("retry_count", 0)
 
@@ -26,28 +26,15 @@ def route_after_verify(state: SolveState) -> str:
 
 
 def build_solve_graph():
-    """
-    Build the answer-solving LangGraph.
-
-    Workflow:
-
-    START → generate → verify
-                     ↓
-              ┌──────┴──────┐
-             PASS          FAIL
-              ↓             ↓
-             END          retry
-                            ↓
-                         generate
-    """
-
     builder = StateGraph(SolveState)
 
+    builder.add_node("route", route_node)
     builder.add_node("generate", generate_node)
     builder.add_node("verify", verify_node)
     builder.add_node("retry", retry_node)
 
-    builder.add_edge(START, "generate")
+    builder.add_edge(START, "route")
+    builder.add_edge("route", "generate")
     builder.add_edge("generate", "verify")
 
     builder.add_conditional_edges(

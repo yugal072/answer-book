@@ -49,3 +49,33 @@ def test_verifier_rejects_wrong_numerical_answer():
 
     assert result["passed"] is False
     assert result["verified_by"] == "symbolic"
+def test_parallel_resistance_with_different_values():
+    question = {
+        "type": "numerical",
+        "text": "Two resistors of 10 ohm and 10 ohm are connected in parallel.",
+    }
+
+    solution = {
+        "answer": "5 ohm",
+    }
+
+    result = verify_solution(question, solution)
+
+    assert result["passed"] is True
+    assert result["verified_by"] == "symbolic"
+
+
+def test_parallel_resistance_rejects_wrong_value():
+    question = {
+        "type": "numerical",
+        "text": "Two resistors of 4 ohm and 4 ohm are connected in parallel.",
+    }
+
+    solution = {
+        "answer": "8 ohm",
+    }
+
+    result = verify_solution(question, solution)
+
+    assert result["passed"] is False
+    assert result["verified_by"] == "symbolic"
