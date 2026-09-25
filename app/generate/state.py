@@ -65,6 +65,9 @@ class QuestionState(TypedDict, total=False):
 class PaperState(TypedDict, total=False):
     """State schema for orchestrating an entire paper with multiple questions."""
 
+    paper_id: str
+    fingerprint: str
+    status: str
     paper_metadata: Dict[str, Any]
     questions: List[Dict[str, Any]]
     total_questions: int

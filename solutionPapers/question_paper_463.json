@@ -1,7 +1,10 @@
 {
   "paper_id": "question_paper_463",
+  "fingerprint": "b72e519c10a4d22f98e1a55546bc32aa463",
+  "status": "ready",
   "metadata": {
     "paper_id": "question_paper_463",
+    "fingerprint": "b72e519c10a4d22f98e1a55546bc32aa463",
     "subject": "Science",
     "class": "Class 9",
     "exam": "CBSE Half-Yearly Exam",
@@ -15,28 +18,28 @@
       "question_number": "1",
       "answer": "(A) Both A and R are true, and R is the correct explanation of A.",
       "steps": [
-        "Step 1: Analyze Assertion (A). Tumours are formed by uncontrolled cell division in somatic (body) cells. Somatic cells divide via mitosis. Therefore, errors in mitosis (such as uncontrolled division or failure of apoptosis) lead to tumour formation. Meiosis occurs only in germ cells to produce gametes and does not directly cause tumours in body tissues. Thus, Assertion (A) is True.",
+        "Step 1: Analyze Assertion (A). Tumours are formed by uncontrolled cell division in somatic (body) cells. Somatic cells divide via mitosis. Therefore, errors in mitosis (such as uncontrolled division or failure of apoptosis) lead to tumour formation. Meiosis occurs only in germ cells to produce gametes and does not directly lead to tumour formation in body tissues. Thus, Assertion (A) is True.",
         "Step 2: Analyze Reason (R). Faulty meiosis results in aneuploidy (abnormal chromosome number) in gametes. If such gametes are fertilized, it can lead to early pregnancy loss (miscarriage) or reduced fertility. Errors in mitosis lead to aneuploidy in somatic cells, which can disrupt normal cell function and contribute to uncontrolled growth (tumours). Thus, Reason (R) is True.",
-        "Step 3: Evaluate the causal link. The assertion states that tumours are a result of mitotic errors, not meiotic errors. The reason explains why: meiotic errors affect gametes (leading to fertility issues/pregnancy loss), whereas mitotic errors affect body cells (leading to abnormal chromosome numbers in somatic cells, which is the context for tumour formation). Therefore, Reason (R) correctly explains why Assertion (A) is true."
+        "Step 3: Evaluate the causal link. The assertion states that tumours are a result of mitotic errors, not meiotic errors. The reason explains why: meiotic errors affect gametes (leading to fertility issues/pregnancy loss), while mitotic errors affect body cells (leading to abnormal chromosome numbers in somatic cells, which is the context for tumour formation). Therefore, R correctly explains A."
       ],
       "mark_split": [
         {
           "marks": 1,
-          "for": "Correctly identifying that both statements are true and that the reason provides the correct explanation for the assertion."
+          "for": "selecting correct option with proper justification"
         }
       ],
       "common_mistakes": [
         {
           "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
-          "why": "Students might think that while both statements are true, the reason only describes the consequences of errors in general and doesn't explicitly link mitotic errors to tumour formation. However, the reason contrasts the outcomes of meiotic vs. mitotic errors, which directly supports why tumours (a somatic issue) arise from mitosis and not meiosis."
+          "why": "Students might think that while both statements are true, the reason doesn't directly explain the assertion. However, the reason explicitly contrasts the outcomes of meiotic vs. mitotic errors, which directly supports why tumours (a somatic issue) arise from mitosis and not meiosis."
         },
         {
           "wrong": "(C) A is true but R is false.",
-          "why": "Students might incorrectly believe that faulty meiosis does not cause early pregnancy loss or reduced fertility, or that mitotic errors do not lead to abnormal chromosome numbers in body cells. In reality, both parts of the reason are biologically accurate."
+          "why": "Students might incorrectly believe that faulty meiosis does not cause early pregnancy loss or reduced fertility, or that mitotic errors do not lead to abnormal chromosome numbers in body cells."
         },
         {
           "wrong": "(D) A is false but R is true.",
-          "why": "Students might confuse the roles of mitosis and meiosis, thinking that meiosis errors can directly cause tumours in body cells. However, meiosis is limited to germ cells, so its errors do not directly lead to tumour formation in somatic tissues."
+          "why": "Students might mistakenly think that meiotic errors can directly lead to tumour formation, which is incorrect as meiosis is limited to germ cells."
         }
       ],
       "confidence": 0.95,
@@ -62,12 +65,12 @@
       ],
       "common_mistakes": [
         {
-          "wrong": "Stating that the boiling points must be exactly 25°C apart.",
-          "why": "The question asks for the minimum difference, not an exact value."
+          "wrong": "Stating that any difference in boiling points allows separation by distillation.",
+          "why": "This is incorrect because simple distillation is only effective when the boiling points differ by at least 25°C."
         },
         {
-          "wrong": "Saying that any difference in boiling points allows separation by distillation.",
-          "why": "This is incorrect because if the difference is less than 25°C, fractional distillation is required."
+          "wrong": "Confusing simple distillation with fractional distillation.",
+          "why": "Fractional distillation is used for liquids with boiling points closer than 25°C, not simple distillation."
         }
       ],
       "confidence": 1.0,
@@ -99,8 +102,8 @@
           "why": "Using the unit of mass (kg) instead of the unit of force (N) for the final answer"
         },
         {
-          "wrong": "4.9 N",
-          "why": "Incorrectly multiplying 5 by 9.8, leading to a decimal point error"
+          "wrong": "490 N",
+          "why": "Incorrect multiplication or misplacing the decimal point when calculating 5 × 9.8"
         }
       ],
       "confidence": 1.0,
@@ -112,31 +115,31 @@
       "answer": "Scientists decide which details to include or ignore based on the level of accuracy required for the model and the complexity of the system being studied.",
       "steps": [
         "Scientists decide which details to include or ignore based on the level of accuracy required for the model and the complexity of the system being studied.",
-        "Example of a detail included: The mass of the cricket ball and the force applied by the bat are included to calculate the trajectory and speed of the ball.",
-        "Example of a detail ignored: The texture of the cricket ball and the air resistance are ignored to simplify the model and focus on the basic physics of the hit."
+        "Example of a detail included: The mass of the cricket ball, as it directly affects the trajectory and speed of the ball when hit.",
+        "Example of a detail ignored: The exact texture of the cricket pitch, as it has a negligible impact on the trajectory of the ball once it is in the air."
       ],
       "mark_split": [
         {
           "marks": 1,
-          "for": "Correctly stating the basis for deciding which details to include or ignore (level of accuracy and complexity)."
+          "for": "Correctly stating the basis for deciding which details to include or ignore (level of accuracy required and complexity of the system)."
         },
         {
           "marks": 1,
-          "for": "Providing a valid example of a detail included in the model."
+          "for": "Providing a valid example of a detail included in the model (e.g., mass of the ball)."
         },
         {
           "marks": 1,
-          "for": "Providing a valid example of a detail ignored in the model."
+          "for": "Providing a valid example of a detail ignored in the model (e.g., exact texture of the pitch)."
         }
       ],
       "common_mistakes": [
         {
           "wrong": "Scientists decide based on personal preference.",
-          "why": "This is incorrect because scientific models are based on objective criteria such as accuracy and complexity, not personal preference."
+          "why": "This is incorrect because scientific models are based on empirical data and the specific requirements of the study, not personal preference."
         },
         {
-          "wrong": "All details are included to make the model as realistic as possible.",
-          "why": "This is incorrect because including all details would make the model too complex and difficult to analyze; simplification is a key aspect of modeling."
+          "wrong": "Example of a detail ignored: The color of the cricket ball.",
+          "why": "While the color of the ball might not affect its trajectory, it is not a strong example of a detail that is ignored because it is not a physical property that would typically be considered in a physics model."
         }
       ],
       "confidence": 0.95,
@@ -149,9 +152,9 @@
       "steps": [
         "Define friction as a contact force that opposes the relative motion or tendency of motion between two surfaces in contact.",
         "State that an object overcomes friction and starts moving when the applied force exceeds the limiting friction (maximum static friction).",
-        "Identify that constant velocity implies zero acceleration (a = 0).",
-        "Apply Newton's Second Law (F_net = ma) to show that since a = 0, the net force acting on the table is zero.",
-        "Conclude that the magnitude of the frictional force is equal to F, as it must balance the applied force to maintain equilibrium."
+        "Identify that since the table moves at a constant velocity, its acceleration is zero.",
+        "Apply Newton's First Law (Law of Inertia) or Second Law (F_net = ma) to state that the net force acting on the table is zero.",
+        "Conclude that the magnitude of the frictional force is equal to the applied force F, acting in the opposite direction."
       ],
       "mark_split": [
         {
@@ -164,25 +167,25 @@
         },
         {
           "marks": 1,
-          "for": "Correct application of Newton's First/Second Law to constant velocity (a=0, F_net=0)."
+          "for": "Identifying constant velocity implies zero acceleration/net force."
         },
         {
           "marks": 1,
-          "for": "Correct conclusion that frictional force magnitude equals F."
+          "for": "Correctly stating frictional force magnitude equals F."
         },
         {
           "marks": 1,
-          "for": "Clear justification linking zero acceleration to balanced forces."
+          "for": "Justification using Newton's Laws (First or Second Law)."
         }
       ],
       "common_mistakes": [
         {
           "wrong": "Friction is always less than the applied force.",
-          "why": "Incorrect; friction adjusts to match the applied force up to the limiting value. In this case, it is exactly equal to F."
+          "why": "Incorrect; friction adjusts to match the applied force up to the limiting value, and equals it during constant velocity motion."
         },
         {
           "wrong": "The frictional force is zero because the table is moving.",
-          "why": "Incorrect; kinetic friction acts during motion. It is not zero unless the surface is frictionless."
+          "why": "Incorrect; kinetic friction acts during motion, and its magnitude is equal to the applied force in this specific constant velocity scenario."
         }
       ],
       "confidence": 1.0,

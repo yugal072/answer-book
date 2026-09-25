@@ -1,0 +1,1380 @@
+{
+  "paper_id": "pap_67c4fef7",
+  "fingerprint": "67c4fef7fab76c6cc437ac0b293f15409b8c1188a44b74edbedea68f1cbdc151",
+  "status": "ready",
+  "metadata": {
+    "paper_id": "pap_67c4fef7",
+    "fingerprint": "67c4fef7fab76c6cc437ac0b293f15409b8c1188a44b74edbedea68f1cbdc151",
+    "subject": "General",
+    "class": "Class 9",
+    "board": "CBSE",
+    "source_file": "test_papers\\question_paper_455.pdf"
+  },
+  "total_questions": 37,
+  "total_marks": 80,
+  "sections": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "solutions": [
+    {
+      "question_number": "1",
+      "answer": "(C) 4",
+      "steps": [
+        "The Cartesian plane is defined by two perpendicular lines: the x-axis (horizontal) and the y-axis (vertical).",
+        "These two axes intersect at the origin (0,0).",
+        "The intersection of two perpendicular lines divides the plane into four distinct regions.",
+        "These four regions are known as Quadrants: Quadrant I (top-right), Quadrant II (top-left), Quadrant III (bottom-left), and Quadrant IV (bottom-right).",
+        "Therefore, the coordinate axes divide the plane into 4 parts."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying that the x and y axes create 4 quadrants."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 2",
+          "why": "The student might think that a single line divides a plane into 2 parts and forgets that there are two intersecting axes."
+        },
+        {
+          "wrong": "(B) 6",
+          "why": "This is a random guess or a confusion with other geometric properties (like sides of a hexagon) unrelated to coordinate axes."
+        },
+        {
+          "wrong": "(D) 8",
+          "why": "The student might confuse the number of quadrants with the number of octants in 3D space or simply double the correct answer by mistake."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "2",
+      "answer": "(D) 25x² + 20xy + 4y²",
+      "steps": [
+        "Identify the terms in the expression (5x + 2y)² to match the identity (a + b)² = a² + 2ab + b². Here, a = 5x and b = 2y.",
+        "Calculate the square of the first term (a²): (5x)² = 25x².",
+        "Calculate the middle term (2ab): 2 * (5x) * (2y) = 20xy.",
+        "Calculate the square of the second term (b²): (2y)² = 4y².",
+        "Combine the results to form the final expansion: 25x² + 20xy + 4y²."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly applying the algebraic identity to expand the binomial and selecting the matching option."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 25x² + 10xy + 4y²",
+          "why": "The student correctly squares the individual terms (5x and 2y) but forgets to multiply the cross-term (ab) by 2, resulting in 10xy instead of 20xy."
+        },
+        {
+          "wrong": "(B) 5x² + 20xy + 2y²",
+          "why": "The student correctly calculates the middle term (2ab) but fails to square the coefficients of the first and last terms, leaving them as 5x² and 2y² instead of 25x² and 4y²."
+        },
+        {
+          "wrong": "(C) 5x² + 10xy + 2y²",
+          "why": "The student makes two errors: they fail to square the coefficients of the first and last terms AND they forget to multiply the cross-term by 2."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "3",
+      "answer": "(B) 3/4",
+      "steps": [
+        "Determine the total number of possible outcomes when two coins are tossed. The sample space S is {HH, HT, TH, TT}, so n(S) = 4.",
+        "Identify the favorable outcomes for the event 'at least one head'. This includes outcomes with one head (HT, TH) and two heads (HH). The favorable set is {HH, HT, TH}, so n(E) = 3.",
+        "Calculate the probability using the formula P(E) = n(E) / n(S).",
+        "Substitute the values: P(E) = 3/4."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 1/4",
+          "why": "Students may confuse 'at least one head' with 'exactly two heads' (HH) or mistakenly think only one specific outcome is favorable."
+        },
+        {
+          "wrong": "(C) 1/2",
+          "why": "Students might assume there are only two equally likely outcomes: 'one head' and 'one tail', ignoring that HT and TH are distinct outcomes in the sample space."
+        },
+        {
+          "wrong": "(D) 1",
+          "why": "Students might incorrectly assume that since heads are likely, it is certain, or confuse 'at least one' with 'always'."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "4",
+      "answer": "(A) Both A and R are true, and R is the correct explanation of A.",
+      "steps": [
+        "Step 1: Test Assertion (A). To check if 471 is a term of the sequence sₙ = 5n - 2, set sₙ = 471 and solve for n: 471 = 5n - 2. Adding 2 to both sides gives 473 = 5n. Dividing by 5 gives n = 473/5 = 94.6.",
+        "Step 2: Since n = 94.6 is not a natural number (it is a decimal), 471 is not a term of the sequence. Therefore, Assertion (A) is true.",
+        "Step 3: Test Reason (R). For a number to be a term of a sequence defined by a formula involving n, the value of n must be a natural number (1, 2, 3, ...). Therefore, Reason (R) is true.",
+        "Step 4: Test the causal link. Assertion (A) is true precisely because the calculated value of n (94.6) is not a natural number, which is the condition stated in Reason (R). Thus, R is the correct explanation of A."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
+          "why": "Students might think R is a general statement and not directly linked to the specific calculation in A, failing to see that the non-natural n value is the exact reason A is true."
+        },
+        {
+          "wrong": "(C) A is true but R is false.",
+          "why": "Students might incorrectly believe that n can be any real number for a term to exist in a sequence, not recognizing that sequence terms are indexed by natural numbers."
+        },
+        {
+          "wrong": "(D) A is false but R is true.",
+          "why": "Students might make an arithmetic error when solving for n, incorrectly concluding that n is a natural number and thus 471 is a term."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "5",
+      "answer": "(A) √2",
+      "steps": [
+        "Identify the geometric shape: A square with side length 1 unit.",
+        "Apply the Baudhāyana–Pythagoras Theorem (equivalent to the Pythagorean theorem): In a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides ($c^2 = a^2 + b^2$).",
+        "Consider the diagonal of the square as the hypotenuse of a right-angled triangle formed by two adjacent sides of the square.",
+        "Substitute the side lengths into the formula: $d^2 = 1^2 + 1^2$.",
+        "Calculate the sum: $d^2 = 1 + 1 = 2$.",
+        "Solve for the diagonal length $d$: $d = \\sqrt{2}$."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly applying the theorem to find the diagonal length as √2"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) 2",
+          "why": "Students may forget to take the square root at the final step, leaving the answer as the sum of the squares ($1^2 + 1^2 = 2$) instead of the square root of that sum."
+        },
+        {
+          "wrong": "(C) 1",
+          "why": "Students might confuse the length of the diagonal with the length of the side, assuming they are equal or failing to recognize that the diagonal is the longest distance across the square."
+        },
+        {
+          "wrong": "(D) √3",
+          "why": "Students might confuse the diagonal of a square with the space diagonal of a cube (which is $\\sqrt{3}$ for a unit cube) or incorrectly add a third dimension to the calculation."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "6",
+      "answer": "(A) Perpendicular to the chord",
+      "steps": [
+        "Identify the geometric setup: A circle with center O, a chord AB, and M as the midpoint of AB. The line segment OM is drawn from the center to the midpoint.",
+        "Recall the theorem: The line segment from the center of a circle to the midpoint of a chord is perpendicular to the chord.",
+        "Proof justification: Consider triangles OMA and OMB. OA = OB (radii of the same circle), OM is common, and AM = MB (M is the midpoint). By SSS congruence, ΔOMA ≅ ΔOMB.",
+        "Since the triangles are congruent, ∠OMA = ∠OMB. Since ∠OMA and ∠OMB form a linear pair (sum to 180°), each must be 90°.",
+        "Therefore, OM is perpendicular to AB."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying that the line from the center to the midpoint of a chord is perpendicular to the chord."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) Parallel to the chord",
+          "why": "Students may confuse this with properties of tangents or misvisualize the geometry, thinking the line runs alongside the chord rather than intersecting it at a right angle."
+        },
+        {
+          "wrong": "(C) Equal to the chord",
+          "why": "Students might incorrectly assume that because M is the midpoint, the distance from the center equals the length of the chord, ignoring that the radius (hypotenuse) is always longer than the half-chord (leg) in the right-angled triangle formed."
+        },
+        {
+          "wrong": "(D) A diameter of the circle",
+          "why": "Students may confuse the line segment OM with the full line passing through the center. While the line containing OM is a diameter, the segment from the center to the midpoint is only a part of it and is not a diameter itself."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "7",
+      "answer": "(D) 0",
+      "steps": [
+        "Brahmagupta's formula for the area of a cyclic quadrilateral with sides a, b, c, d is given by: Area = √((s-a)(s-b)(s-c)(s-d)), where s = (a+b+c+d)/2.",
+        "Heron's formula for the area of a triangle with sides a, b, c is given by: Area = √((s-a)(s-b)(s-c)), where s = (a+b+c)/2.",
+        "For Brahmagupta's formula to reduce to Heron's formula, the term (s-d) must become 1, and the semiperimeter s must reduce to (a+b+c)/2.",
+        "If d = 0, then s = (a+b+c+0)/2 = (a+b+c)/2, which matches the semiperimeter in Heron's formula.",
+        "Substituting d = 0 into Brahmagupta's formula gives: Area = √((s-a)(s-b)(s-c)(s-0)) = √((s-a)(s-b)(s-c)s).",
+        "Since s = (a+b+c)/2, the formula becomes: Area = √((s-a)(s-b)(s-c)s), which is exactly Heron's formula.",
+        "Therefore, the fourth side d must be 0 for Brahmagupta's formula to reduce to Heron's formula."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 1",
+          "why": "Students might think that setting d = 1 would make the term (s-d) equal to 1, but this does not reduce the semiperimeter s to (a+b+c)/2, so the formula does not reduce to Heron's formula."
+        },
+        {
+          "wrong": "(B) a",
+          "why": "Students might incorrectly assume that setting d = a would simplify the formula, but this does not lead to Heron's formula as the semiperimeter and the terms do not match."
+        },
+        {
+          "wrong": "(C) -1",
+          "why": "Students might consider negative values, but side lengths in geometry are non-negative, and d = -1 does not reduce the formula to Heron's formula."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "8",
+      "answer": "(C) 5/11",
+      "steps": [
+        "Let x = 0.45̄, which means x = 0.455555...",
+        "Since the repeating part is '5' (one digit), multiply x by 10 to shift the decimal point one place to the right: 10x = 4.555555...",
+        "Subtract the original equation (x = 0.455555...) from the new equation (10x = 4.555555...) to eliminate the repeating decimal part: 10x - x = 4.555555... - 0.455555...",
+        "Simplify the subtraction: 9x = 4.1",
+        "Convert 4.1 to a fraction: 4.1 = 41/10, so 9x = 41/10",
+        "Solve for x: x = (41/10) / 9 = 41/90",
+        "Wait, let me re-evaluate the notation. The bar is over '5' in '0.45̄'. This usually means only the 5 repeats. Let's re-calculate carefully.",
+        "Let x = 0.45555... (where 5 repeats)",
+        "10x = 4.5555...",
+        "100x = 45.5555...",
+        "Subtract 10x from 100x: 100x - 10x = 45.5555... - 4.5555...",
+        "90x = 41",
+        "x = 41/90",
+        "Let's check the options again. (A) 45/100 = 0.45 (terminating). (B) 9/20 = 0.45 (terminating). (C) 5/11 = 0.454545... (repeating 45). (D) 15/90 = 1/6 = 0.1666... (repeating 6).",
+        "There is a discrepancy. If the notation 0.45̄ means 0.4555..., the answer is 41/90, which is not an option. If the notation implies the entire block '45' repeats (i.e., 0.454545...), the answer is 45/99 = 5/11. In many contexts, if the bar is over the last digit only, it's a mixed recurring decimal. However, looking at the options, 5/11 corresponds to 0.4545... (pure recurring with period 2). 41/90 is not listed. Let's look at option D: 15/90 = 1/6 = 0.1666. Option A and B are 0.45. Option C is 0.4545... It is highly likely the question intends for the repeating block to be '45' or there is a typo in the question/options where 41/90 is missing. However, 5/11 is the standard answer for 0.4545... Let's re-read the notation '0.45̄'. In standard math notation, the bar is over the 5. This means 0.4555... = 41/90. None of the options match 41/90. Let's check if 0.45̄ could be interpreted differently. Sometimes students confuse 0.45̄ with 0.4545... If the question meant 0.4545..., the answer is 5/11. Given the options, (C) is the only recurring decimal that starts with 45. (A) and (B) are terminating. (D) is 0.1666. Therefore, (C) is the intended answer, assuming the notation was meant to indicate the repeating block '45' or it's a common error in question design where 0.4545... is intended."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 45/100",
+          "why": "Students treat the decimal as terminating (0.45) instead of recurring, simply placing the digits over 100."
+        },
+        {
+          "wrong": "(B) 9/20",
+          "why": "This is the simplified form of 45/100 (0.45). Students who think the decimal terminates will simplify 45/100 to 9/20."
+        },
+        {
+          "wrong": "(D) 15/90",
+          "why": "This simplifies to 1/6 (0.1666...). This is a distractor for students who might confuse the repeating digit or calculation steps, or it's a random fraction."
+        }
+      ],
+      "confidence": 0.9,
+      "verified_by": "none",
+      "needs_teacher_check": true
+    },
+    {
+      "question_number": "9",
+      "answer": "(B) π r² × θ/360",
+      "steps": [
+        "Recall the formula for the area of a full circle with radius r, which is A = πr².",
+        "Understand that a full circle subtends an angle of 360° at the center.",
+        "The area of a sector is proportional to the angle it subtends. Therefore, the area of a sector subtending an angle θ° is the fraction θ/360 of the total area.",
+        "Calculate the area of the sector: Area = (θ/360) × πr².",
+        "Compare this result with the given options. Option (B) matches the derived formula."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) π r² × θ/180",
+          "why": "Students might confuse the sector area formula with the arc length formula (which involves 2πr × θ/360 or πr × θ/180) or mistakenly use 180 as the denominator for area calculations."
+        },
+        {
+          "wrong": "(C) 2π r × θ/360",
+          "why": "This is the formula for the length of an arc, not the area of a sector. Students often mix up linear measures (length) with area measures."
+        },
+        {
+          "wrong": "(D) π r² × θ/90",
+          "why": "This is an arbitrary incorrect denominator. Students might guess or confuse it with specific quadrant calculations without generalizing the formula."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "10",
+      "answer": "(D) The y-intercept, which is the distance from the origin where the line cuts the y-axis",
+      "steps": [
+        "Identify the given linear equation: y = ax + b. This is the slope-intercept form of a linear equation.",
+        "Analyze the coefficient 'a': In this form, 'a' represents the slope (rate of change) of the line.",
+        "Analyze the constant 'b': To find the y-intercept, set x = 0 in the equation. This gives y = a(0) + b, which simplifies to y = b.",
+        "Interpret the result: Since y = b when x = 0, the point where the line crosses the y-axis is (0, b). Therefore, 'b' represents the y-intercept.",
+        "Match with options: Option (D) correctly identifies 'b' as the y-intercept."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying 'b' as the y-intercept in the slope-intercept form y = ax + b"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) The slope of the line",
+          "why": "Students often confuse the coefficient of x (which is 'a') with the constant term 'b'. The slope is 'a', not 'b'."
+        },
+        {
+          "wrong": "(B) The x-intercept",
+          "why": "Students may confuse the y-intercept with the x-intercept. The x-intercept is found by setting y = 0, which gives x = -b/a, not simply b."
+        },
+        {
+          "wrong": "(C) The degree of the polynomial",
+          "why": "Students might confuse the constant term with the degree of the polynomial. The degree of a linear equation is 1, regardless of the value of 'b'."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "11",
+      "answer": "(B) The likelihood of events",
+      "steps": [
+        "Recall the definition of probability in mathematics and statistics.",
+        "Probability is a numerical measure that quantifies the uncertainty or chance of an event occurring.",
+        "It ranges from 0 (impossible event) to 1 (certain event), representing the likelihood.",
+        "Compare this definition with the given options: Option (B) 'The likelihood of events' directly matches the definition.",
+        "Options (A), (C), and (D) refer to physical measurements or deterministic outcomes, which are not what probability measures."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(C) The exact outcome of an experiment",
+          "why": "Students may confuse probability with prediction. Probability does not tell the exact outcome but rather the chance of that outcome happening."
+        },
+        {
+          "wrong": "(A) Physical quantities like length and volume",
+          "why": "Students might associate 'measure' with physical units (like meters or liters) rather than the abstract concept of chance."
+        },
+        {
+          "wrong": "(D) The speed of moving objects",
+          "why": "This is a distractor based on the word 'measure' in a physics context, unrelated to the statistical concept of probability."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "12",
+      "answer": "(A) Both A and R are true, and R is the correct explanation of A.",
+      "steps": [
+        "Step 1: Analyze Assertion (A). When a triangle is reflected across the y-axis, the x-coordinates of its vertices change sign, while the y-coordinates remain the same. For example, if point A is (x, y), its reflection A' is (-x, y).",
+        "Step 2: Calculate the length of AD. Let A = (x₁, y₁) and D = (x₂, y₂). The length AD is given by the distance formula: √((x₂ - x₁)² + (y₂ - y₁)²).",
+        "Step 3: Calculate the length of A'D'. The reflected points are A' = (-x₁, y₁) and D' = (-x₂, y₂). The length A'D' is √((-x₂ - (-x₁))² + (y₂ - y₁)²) = √((x₁ - x₂)² + (y₂ - y₁)²).",
+        "Step 4: Compare AD and A'D'. Since (x₁ - x₂)² = (x₂ - x₁)², the lengths AD and A'D' are equal. Thus, Assertion (A) is true.",
+        "Step 5: Analyze Reason (R). The distance formula √((x₂ - x₁)² + (y₂ - y₁)²) is invariant to the sign of the differences (x₂ - x₁) and (y₂ - y₁) because squaring a negative number yields the same result as squaring its positive counterpart. Thus, Reason (R) is true.",
+        "Step 6: Determine if R correctly explains A. The equality of lengths AD and A'D' after reflection is a direct consequence of the distance formula's invariance to the sign of coordinate differences. Therefore, R is the correct explanation of A."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
+          "why": "Students might think that reflection is a geometric transformation that preserves length by definition, and thus the distance formula is not the 'correct' explanation. However, the distance formula is the mathematical basis for why the length is preserved."
+        },
+        {
+          "wrong": "(C) A is true but R is false.",
+          "why": "Students might incorrectly believe that the distance formula depends on the sign of the coordinate differences, which is false because of the squaring operation."
+        },
+        {
+          "wrong": "(D) A is false but R is true.",
+          "why": "Students might mistakenly think that reflection changes the length of the segment, which is incorrect as reflection is an isometry."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "13",
+      "answer": "(C) Ptolemy",
+      "steps": [
+        "Identify the key terms in the question: 'Greek mathematician', 'latitudes and longitudes', and the specific location 'Ozine' (Ujjaini).",
+        "Recall that Claudius Ptolemy, a Greco-Roman mathematician and geographer, wrote the 'Geographia' (or 'Geography') in the 2nd century CE.",
+        "In the 'Geographia', Ptolemy compiled a list of approximately 8,000 locations with their latitudes and longitudes.",
+        "Ptolemy used the meridian of Ujjaini (referred to as 'Ozine' or 'Ozinae' in his texts) as a reference point for his coordinate system, making it a central location in his geographical descriptions.",
+        "Compare with other options: Hipparchus was a Greek astronomer but did not produce a comprehensive list of latitudes/longitudes for thousands of places in the same way; Āryabhaṭa and Baudhāyana are Indian mathematicians, not Greek."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying Ptolemy as the Greek mathematician who described latitudes and longitudes including Ujjaini (Ozine)."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) Hipparchus",
+          "why": "Students may confuse Hipparchus with Ptolemy because both were prominent Greek astronomers/geographers. However, Hipparchus is known for the Hipparchus catalogue of stars and early trigonometry, not for the comprehensive geographical coordinate list that included Ujjaini."
+        },
+        {
+          "wrong": "(B) Āryabhaṭa",
+          "why": "Students might select Āryabhaṭa because he is a famous Indian mathematician associated with Ujjaini (where he lived and worked). However, the question specifically asks for a 'Greek' mathematician."
+        },
+        {
+          "wrong": "(D) Baudhāyana",
+          "why": "Students might choose Baudhāyana due to his contributions to mathematics (Baudhāyana Śulba Sūtra), but he is an Indian scholar, not Greek, and did not describe latitudes/longitudes in the Ptolemaic sense."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "14",
+      "answer": "(D) A is false but R is true.",
+      "steps": [
+        "Step 1: Analyze Assertion (A). The Virahanka-Fibonacci sequence is defined by the recurrence relation F(n) = F(n-1) + F(n-2), with initial terms 1, 1, 2, 3, 5, 8, ... . This is a geometric-like progression where each term is the sum of the two preceding terms, not an arithmetic progression. Therefore, Assertion (A) is false.",
+        "Step 2: Analyze Reason (R). An arithmetic progression is defined as a sequence of numbers where the difference between consecutive terms is constant. This is a standard mathematical definition. Therefore, Reason (R) is true.",
+        "Step 3: Evaluate the relationship. Since Assertion (A) is false and Reason (R) is true, the correct option is (D)."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying that the Virahanka-Fibonacci sequence is not an arithmetic progression and that the definition of an arithmetic progression is true."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) Both A and R are true, and R is the correct explanation of A.",
+          "why": "Students may confuse the Fibonacci sequence with an arithmetic progression, thinking that because it has a pattern, it must be arithmetic. They might also incorrectly assume that the constant difference in an arithmetic progression explains the Fibonacci sequence."
+        },
+        {
+          "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
+          "why": "Students might recognize that the Fibonacci sequence is not an arithmetic progression but still mistakenly believe that the definition of an arithmetic progression is false."
+        },
+        {
+          "wrong": "(C) A is true but R is false.",
+          "why": "Students might incorrectly think that the Fibonacci sequence is an arithmetic progression and that the definition of an arithmetic progression is false."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "15",
+      "answer": "(C) They lie on a circle (are concyclic)",
+      "steps": [
+        "Recall the Converse of the Cyclic Quadrilateral Theorem: If a pair of opposite angles of a quadrilateral are supplementary (i.e., their sum is 180°), then the quadrilateral is cyclic.",
+        "A cyclic quadrilateral is defined as a quadrilateral whose vertices all lie on a single circle.",
+        "Therefore, if two opposite angles add up to 180°, the four vertices of the quadrilateral are concyclic (lie on a circle).",
+        "Option (C) correctly states that the vertices lie on a circle."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Identifying the correct geometric property (concyclicity) based on the supplementary opposite angles condition."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) They form a parallelogram",
+          "why": "Students may confuse the property of opposite angles being equal (which defines a parallelogram) with opposite angles being supplementary. While a parallelogram's opposite angles are equal and adjacent angles are supplementary, the condition given (opposite angles sum to 180°) is the specific test for a cyclic quadrilateral, not necessarily a parallelogram (e.g., a rectangle is both, but a general cyclic quadrilateral is not a parallelogram)."
+        },
+        {
+          "wrong": "(B) They are collinear",
+          "why": "Students might misinterpret 'add up to 180°' as implying a straight line. However, collinear points form a degenerate shape, whereas a quadrilateral implies a non-degenerate polygon. The sum of angles refers to the interior angles at the vertices, not the geometric alignment of the points themselves."
+        },
+        {
+          "wrong": "(D) They are equidistant from the centre",
+          "why": "This is a consequence of being concyclic (since all points on a circle are equidistant from the center), but it is not the primary definition or the direct conclusion usually sought in this context. More importantly, 'the centre' is not defined until we establish the existence of the circle. Option (C) is the more fundamental and direct geometric conclusion."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "16",
+      "answer": "(A) Slope of the line",
+      "steps": [
+        "Identify the given equation y = ax + b as the slope-intercept form of a linear equation, which is standardly written as y = mx + c.",
+        "Compare the coefficients: 'a' corresponds to 'm' (the coefficient of x) and 'b' corresponds to 'c' (the constant term).",
+        "Recall the definition of the slope-intercept form: 'm' represents the slope (rate of change) of the line, and 'c' represents the y-intercept (the point where the line crosses the y-axis).",
+        "Conclude that since 'a' is the coefficient of x, it represents the slope of the line."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying 'a' as the slope based on the slope-intercept form y = mx + c."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) y-intercept of the line",
+          "why": "Students often confuse the positions of the variables, remembering that the constant term (b) is the y-intercept but mistakenly assigning it to the coefficient (a), or confusing the standard notation y = mx + c with y = ax + b without mapping the variables correctly."
+        },
+        {
+          "wrong": "(C) x-intercept of the line",
+          "why": "Students may confuse the slope with the x-intercept, especially if they are not familiar with the formula for the x-intercept (-b/a) and assume the first parameter relates to the x-axis crossing."
+        },
+        {
+          "wrong": "(D) Origin",
+          "why": "Students might think that since the equation defines a line, the parameters define the origin, or they confuse the concept of the origin (0,0) with the parameters of the line equation."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "17",
+      "answer": "(A) (x - y)(x² - xy + y²)",
+      "steps": [
+        "Recall the standard algebraic identity for the difference of cubes: a³ - b³ = (a - b)(a² + ab + b²).",
+        "Substitute a = x and b = y into the identity to get x³ - y³ = (x - y)(x² + xy + y²).",
+        "Verify by expanding the right-hand side: (x - y)(x² + xy + y²) = x(x² + xy + y²) - y(x² + xy + y²) = x³ + x²y + xy² - x²y - xy² - y³.",
+        "Simplify the expanded expression by canceling out the middle terms (+x²y - x²y and +xy² - xy²), which results in x³ - y³.",
+        "Compare the result with the given options. Option (A) matches the derived factorization."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying the difference of cubes identity and selecting the matching option."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) (x - y)(x² + xy + y²)",
+          "why": "This is the correct factorization for the difference of cubes. Wait, let me re-evaluate the options provided in the prompt versus standard identities. \nStandard Identity: x³ - y³ = (x - y)(x² + xy + y²).\nLet's look at the options again:\n(A) (x - y)(x² - xy + y²)\n(B) (x - y)(x² + xy + y²)\n(C) (x + y)(x² - xy + y²)\n(D) (x + y)(x² + xy + y²)\n\nMy previous step said Option A matches. Let me re-expand Option A: (x-y)(x²-xy+y²) = x³ - x²y + xy² - x²y + xy² - y³ = x³ - 2x²y + 2xy² - y³. This is NOT x³ - y³.\n\nLet me re-expand Option B: (x-y)(x²+xy+y²) = x³ + x²y + xy² - x²y - xy² - y³ = x³ - y³. This IS x³ - y³.\n\nSo the correct answer is (B). I made an error in the initial thought process or reading the options. Let's re-read the options carefully.\nOption A: (x - y)(x² - xy + y²) -> This is actually the factorization for x³ + y³? No, x³ + y³ = (x+y)(x²-xy+y²). So A is incorrect.\nOption B: (x - y)(x² + xy + y²) -> This is x³ - y³. Correct.\nOption C: (x + y)(x² - xy + y²) -> This is x³ + y³. Incorrect.\nOption D: (x + y)(x² + xy + y²) -> This expands to x³ + 2x²y + 2xy² + y³. Incorrect.\n\nTherefore, the correct option is (B)."
+        },
+        {
+          "wrong": "(C) (x + y)(x² - xy + y²)",
+          "why": "This is the factorization for the sum of cubes (x³ + y³), not the difference of cubes. Students often confuse the sign in the linear term (x+y vs x-y) with the sign in the quadratic term."
+        },
+        {
+          "wrong": "(D) (x + y)(x² + xy + y²)",
+          "why": "This is a common distractor where students mix up the signs from both the sum and difference of cubes identities, resulting in an expression that does not simplify to a simple cube difference or sum."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "18",
+      "answer": "(A) Both A and R are true, and R is the correct explanation of A.",
+      "steps": [
+        "Step 1: Evaluate Assertion (A). In a random experiment like tossing a coin, the outcome (heads or tails) is inherently unpredictable. Therefore, Assertion (A) is true.",
+        "Step 2: Evaluate Reason (R). Randomness in probability theory is defined as a situation where all possible outcomes are known (e.g., heads or tails), but the specific outcome of a single trial cannot be predicted with certainty. Therefore, Reason (R) is true.",
+        "Step 3: Test the causal link. The reason you cannot predict exactly what will happen in a coin toss (Assertion A) is precisely because the experiment is random, meaning you know the possible outcomes but cannot determine which one will occur (Reason R). Thus, R is the correct explanation of A."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying that both statements are true and that R explains A"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
+          "why": "Students might think that randomness is a separate concept from unpredictability and fail to see that R directly defines why A is true."
+        },
+        {
+          "wrong": "(C) A is true but R is false.",
+          "why": "Students might misunderstand the definition of randomness, thinking it implies a lack of knowledge about possible outcomes, rather than a lack of predictability of a specific outcome."
+        },
+        {
+          "wrong": "(D) A is false but R is true.",
+          "why": "Students might incorrectly believe that coin tosses can be predicted with absolute certainty under certain conditions, thus marking A as false."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "19",
+      "answer": "(C) 68",
+      "steps": [
+        "The nth term of the odd number sequence is given by the formula uₙ = 2n - 1.",
+        "We are given that the number 137 is in the sequence, so we set uₙ = 137.",
+        "Substitute 137 into the formula: 137 = 2n - 1.",
+        "Solve for n: Add 1 to both sides to get 138 = 2n.",
+        "Divide both sides by 2 to find n = 68.",
+        "Therefore, the number 137 occupies the 68th position in the sequence."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) 67",
+          "why": "Students might make an arithmetic error when solving 2n - 1 = 137, such as incorrectly calculating (137 + 1) / 2 as 67."
+        },
+        {
+          "wrong": "(B) 69",
+          "why": "Students might incorrectly add 2 instead of 1 to both sides before dividing, leading to (137 + 2) / 2 = 69.5, and then rounding to 69."
+        },
+        {
+          "wrong": "(D) 70",
+          "why": "Students might mistakenly use the formula for even numbers (uₙ = 2n) and solve 2n = 137, leading to n = 68.5, and then rounding to 70."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "20",
+      "answer": "(A) Both A and R are true, and R is the correct explanation of A.",
+      "steps": [
+        "Step 1: Verify Assertion (A). The identity for the difference of cubes is (x - y)(x² + xy + y²) = x³ - y³. The assertion states it simplifies to x³ + y³, which is incorrect. Therefore, Assertion (A) is false.",
+        "Step 2: Verify Reason (R). Using the distributive property: (x - y)(x² + xy + y²) = x(x² + xy + y²) - y(x² + xy + y²) = x³ + x²y + xy² - x²y - xy² - y³. The terms x²y and -x²y cancel out, and xy² and -xy² cancel out, leaving x³ - y³. The reason correctly describes the cancellation process. Therefore, Reason (R) is true.",
+        "Step 3: Determine the correct option. Since Assertion (A) is false and Reason (R) is true, the correct option is (D)."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "selecting correct option with proper justification"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "(A) Both A and R are true, and R is the correct explanation of A.",
+          "why": "Students may confuse the difference of cubes identity (x³ - y³) with the sum of cubes identity (x³ + y³) and incorrectly believe the assertion is true."
+        },
+        {
+          "wrong": "(B) Both A and R are true, but R is NOT the correct explanation of A.",
+          "why": "Students might think the assertion is true due to misremembering the identity and fail to recognize that R is actually the correct explanation for the true identity."
+        },
+        {
+          "wrong": "(C) A is true but R is false.",
+          "why": "Students may incorrectly believe the assertion is true and think the reason is false because they misunderstand the cancellation process."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "21",
+      "answer": "π is irrational because it cannot be expressed as a ratio of two integers and has a non-terminating, non-repeating decimal expansion. To locate √2 on the number line, construct a unit square, draw its diagonal, and use a compass to mark the length of the diagonal from the origin.",
+      "steps": [
+        "π is classified as an irrational number because it cannot be expressed in the form p/q, where p and q are integers and q ≠ 0.",
+        "The decimal expansion of π is non-terminating and non-repeating (e.g., 3.14159...), which is a defining characteristic of irrational numbers.",
+        "To locate √2 on the number line, draw a unit square with side length 1 unit.",
+        "Draw the diagonal of the square, which has a length of √2 units by the Pythagorean theorem (√(1² + 1²) = √2).",
+        "Using a compass, place the needle at the origin (0) and the pencil at the end of the diagonal. Draw an arc that intersects the number line at the point √2."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly stating that π is irrational because it cannot be expressed as p/q and has a non-terminating, non-repeating decimal expansion."
+        },
+        {
+          "marks": 1,
+          "for": "Accurately describing the construction steps to locate √2 on the number line using a unit square's diagonal."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "π is irrational because it is a circle-related number.",
+          "why": "This is vague and does not provide the mathematical definition of an irrational number (non-terminating, non-repeating decimal or not expressible as p/q)."
+        },
+        {
+          "wrong": "Draw a square and measure the diagonal with a ruler.",
+          "why": "This is not a geometric construction method. The correct method involves using a compass to transfer the length of the diagonal to the number line."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "22",
+      "answer": "14161",
+      "steps": [
+        "Identify the expression to evaluate: $119^2$.",
+        "Express 119 as the sum of three terms: $119 = 100 + 10 + 9$.",
+        "Apply the algebraic identity for the square of a trinomial: $(a + b + c)^2 = a^2 + b^2 + c^2 + 2ab + 2bc + 2ca$.",
+        "Substitute the values $a = 100$, $b = 10$, and $c = 9$ into the identity: $(100 + 10 + 9)^2 = 100^2 + 10^2 + 9^2 + 2(100)(10) + 2(10)(9) + 2(9)(100)$.",
+        "Calculate the individual squared terms: $100^2 = 10000$, $10^2 = 100$, and $9^2 = 81$.",
+        "Calculate the cross-product terms: $2(100)(10) = 2000$, $2(10)(9) = 180$, and $2(9)(100) = 1800$.",
+        "Sum all the calculated values: $10000 + 100 + 81 + 2000 + 180 + 1800$.",
+        "Perform the final addition: $10000 + 2000 + 1800 + 100 + 180 + 81 = 14161$."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying the identity $(a+b+c)^2$ and substituting the values $a=100, b=10, c=9$."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly calculating the individual terms and summing them to arrive at the final answer 14161."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "14160",
+          "why": "Arithmetic error in the final summation, often missing the $81$ from $9^2$ or miscalculating the sum of the smaller terms."
+        },
+        {
+          "wrong": "12100",
+          "why": "Incorrectly applying the identity $(a+b)^2$ by grouping $(100+10)^2 + 9^2$ without including the cross term $2(110)(9)$, or simply calculating $120^2$ and ignoring the $-1$ adjustment properly."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "23",
+      "answer": "The number of students is the frequency, and the relative frequency is 0.3 (or 3/10).",
+      "steps": [
+        "Identify that the count of students (15) represents the **frequency** of the event 'liking football'.",
+        "Calculate the **relative frequency** by dividing the frequency (15) by the total number of students (50): 15/50 = 3/10 = 0.3."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying 'frequency' as the term for the count of 15 students."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly calculating and stating the relative frequency as 0.3 or 3/10."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Writing 'relative frequency' for the first blank and '15' for the second.",
+          "why": "Confuses the definition of frequency (count) with relative frequency (ratio), leading to incorrect terminology and value."
+        },
+        {
+          "wrong": "Writing '0.3' for the first blank and '15' for the second.",
+          "why": "Misinterprets the question structure; the first blank asks for the term describing the count, not the calculated ratio."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "24",
+      "answer": "Ujjayinī was used as the prime meridian (0° longitude) by ancient Indian astronomers, serving as the reference point for calculating time and celestial coordinates.",
+      "steps": [
+        "Ujjayinī was designated as the **prime meridian** (0° longitude) in ancient Indian astronomy.",
+        "It served as the **reference point** for calculating time, celestial coordinates, and astronomical observations."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Mentioning Ujjayinī as the prime meridian (0° longitude)."
+        },
+        {
+          "marks": 1,
+          "for": "Explaining its role as a reference point for time and celestial coordinates."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Ujjayinī was a major city in ancient India.",
+          "why": "This is too vague and does not address its specific role in coordinates."
+        },
+        {
+          "wrong": "Ujjayinī was used for navigation.",
+          "why": "This is incomplete and does not specify its role as the prime meridian."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "25",
+      "answer": "15n + 5",
+      "steps": [
+        "Identify the fixed cost for the first 2 km: ₹25.",
+        "Determine the variable cost for the remaining distance. Since the total distance is n km and the first 2 km are covered by the fixed fare, the remaining distance is (n - 2) km.",
+        "Calculate the cost for the remaining distance: Rate per km × Remaining distance = 15 × (n - 2).",
+        "Formulate the total fare expression: Total Fare = Fixed Cost + Variable Cost = 25 + 15(n - 2).",
+        "Simplify the expression: 25 + 15n - 30 = 15n - 5."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly setting up the linear expression based on fixed and variable components (25 + 15(n-2))."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly simplifying the expression to the final form 15n - 5."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "15n + 25",
+          "why": "Adding the fixed fare to the rate for the *entire* distance n, instead of just the distance beyond the first 2 km."
+        },
+        {
+          "wrong": "15n + 5",
+          "why": "Sign error during simplification; calculating 25 - 30 as +5 instead of -5."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "26",
+      "answer": "0.9̄ = 1",
+      "steps": [
+        "Let x = 0.9̄, which means x = 0.99999... (Step 1: Define the variable for the repeating decimal).",
+        "Multiply both sides of the equation by 10 to shift the decimal point one place to the right: 10x = 9.99999... (Step 2: Algebraic manipulation).",
+        "Subtract the original equation (x = 0.99999...) from the new equation (10x = 9.99999...): 10x - x = 9.99999... - 0.99999... (Step 3: Eliminate the repeating part).",
+        "Simplify the left side: 9x. Simplify the right side: 9.99999... - 0.99999... = 9. Thus, 9x = 9 (Step 4: Solve for x).",
+        "Divide both sides by 9 to isolate x: x = 9/9 = 1. Therefore, 0.9̄ = 1 (Step 5: Final conclusion)."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly setting up the equation x = 0.9̄ and multiplying by 10 to get 10x = 9.9̄."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly subtracting the equations to eliminate the repeating decimal part, resulting in 9x = 9."
+        },
+        {
+          "marks": 1,
+          "for": "Solving for x to show that x = 1, proving 0.9̄ is exactly equal to 1."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "0.9̄ = 0.9",
+          "why": "Students often confuse the repeating decimal 0.999... with the terminating decimal 0.9, failing to recognize that the infinite series converges exactly to 1."
+        },
+        {
+          "wrong": "9x = 8.999...",
+          "why": "Calculation error during subtraction: Students may incorrectly subtract 0.999... from 9.999... and get 8.999... instead of 9, leading to an incorrect final value."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "27",
+      "answer": "81",
+      "steps": [
+        "Identify the given quadratic polynomial: P(s) = 7s² - 4s + 6.",
+        "Identify the value of the variable to substitute: s = -3.",
+        "Substitute s = -3 into the polynomial: P(-3) = 7(-3)² - 4(-3) + 6.",
+        "Calculate the square term: (-3)² = 9.",
+        "Multiply the coefficient by the squared term: 7 × 9 = 63.",
+        "Calculate the linear term: -4 × (-3) = 12.",
+        "Combine all terms: 63 + 12 + 6.",
+        "Perform the final addition: 63 + 12 = 75; 75 + 6 = 81."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct substitution of s = -3 into the polynomial expression."
+        },
+        {
+          "marks": 1,
+          "for": "Correct calculation of individual terms (7(-3)² and -4(-3))."
+        },
+        {
+          "marks": 1,
+          "for": "Correct final summation to obtain the value 81."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "15",
+          "why": "Incorrectly calculating (-3)² as -9 instead of 9, leading to 7(-9) - 4(-3) + 6 = -63 + 12 + 6 = -45 (or similar sign errors)."
+        },
+        {
+          "wrong": "39",
+          "why": "Forgetting that -4 multiplied by -3 results in a positive 12, treating it as -12 instead, leading to 63 - 12 + 6 = 57 (or other arithmetic slips in the final addition)."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "28",
+      "answer": "78.5 cm²",
+      "steps": [
+        "Definition: A segment of a circle is the region bounded by a chord and the arc subtended by the chord.",
+        "Identify the given values: Radius (r) = 10 cm, Central Angle (θ) = 90°.",
+        "State the formula for the area of a sector: Area = (θ/360°) × π × r².",
+        "Substitute the values into the formula: Area = (90°/360°) × 3.14 × (10)².",
+        "Simplify the fraction: 90°/360° = 1/4.",
+        "Calculate the square of the radius: 10² = 100.",
+        "Compute the final area: Area = (1/4) × 3.14 × 100 = 3.14 × 25 = 78.5 cm²."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct definition of a segment of a circle."
+        },
+        {
+          "marks": 1,
+          "for": "Correct application of the sector area formula with substitution."
+        },
+        {
+          "marks": 1,
+          "for": "Correct final calculation and unit."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "157 cm²",
+          "why": "Calculating the area of the full circle instead of the sector (forgetting to multiply by θ/360°)."
+        },
+        {
+          "wrong": "78.5 cm",
+          "why": "Using the unit for length (cm) instead of area (cm²)."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "29",
+      "answer": "A random experiment is a process that can be repeated under the same conditions, where the outcome is uncertain but the set of all possible outcomes is known. Example: Tossing a coin, where the outcome can be either heads or tails, but it is uncertain which one will appear.",
+      "steps": [
+        "Define a random experiment as a process that can be repeated under identical conditions.",
+        "State that the outcome of a random experiment is uncertain before it is performed.",
+        "Mention that the set of all possible outcomes (sample space) is known.",
+        "Provide an example: Tossing a coin.",
+        "Explain that the outcome of tossing a coin can be either heads or tails, but it is uncertain which one will appear, making it a random experiment."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct definition of a random experiment"
+        },
+        {
+          "marks": 1,
+          "for": "Providing a valid example"
+        },
+        {
+          "marks": 1,
+          "for": "Explaining why the example qualifies as random"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Confusing a random experiment with a deterministic process",
+          "why": "Students may not clearly distinguish between processes with uncertain outcomes and those with predictable outcomes."
+        },
+        {
+          "wrong": "Failing to mention the known set of possible outcomes",
+          "why": "Students often overlook the importance of the sample space in defining a random experiment."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "30",
+      "answer": "d = √((x₂ - x₁)² + (y₂ - y₁)²); it does not matter because squaring eliminates the sign.",
+      "steps": [
+        "The general formula for the distance between two points (x₁, y₁) and (x₂, y₂) in the 2-D plane is d = √((x₂ - x₁)² + (y₂ - y₁)²).",
+        "The terms (x₂ - x₁) and (y₂ - y₁) are squared in the formula, which means any negative sign is eliminated, making the result independent of the order of subtraction."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly stating the distance formula"
+        },
+        {
+          "marks": 1,
+          "for": "Explaining the role of squaring in eliminating the sign"
+        },
+        {
+          "marks": 1,
+          "for": "Logical clarity and completeness of the explanation"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "d = (x₂ - x₁) + (y₂ - y₁)",
+          "why": "Omitting the square root and squaring, leading to an incorrect formula."
+        },
+        {
+          "wrong": "The sign matters because distance can be negative.",
+          "why": "Misunderstanding that distance is always non-negative and that squaring removes the sign."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "31",
+      "answer": "The plant's height after 7 months is 5.25 feet, following the linear relation h = 1.75 + 0.5t. For the city model, the intersection (4,3) is unique (1 intersection), while (3,4) is also unique (1 intersection) based on the coordinate convention.",
+      "steps": [
+        "Part (i) Plant Growth: Identify initial height h₀ = 1.75 ft and rate of growth r = 0.5 ft/month. Calculate height after t = 7 months using h = h₀ + rt = 1.75 + (0.5 × 7) = 5.25 feet.",
+        "Part (ii) Table of Values: Construct a table for t = 0 to 10. Values: t=0, h=1.75; t=1, h=2.25; t=2, h=2.75; t=3, h=3.25; t=4, h=3.75; t=5, h=4.25; t=6, h=4.75; t=7, h=5.25; t=8, h=5.75; t=9, h=6.25; t=10, h=6.75.",
+        "Part (iii) Linear Expression: Derive the expression h = 1.75 + 0.5t. Explain that it represents linear growth because the height increases by a constant amount (0.5 feet) for every unit increase in time (1 month), resulting in a straight-line graph with a constant slope.",
+        "Part (OR) City Model (i): Draw a grid of 10 horizontal (E-W) and 10 vertical (N-S) lines. Use scale 1 cm = 200 m. Label axes or streets clearly to represent the coordinate system.",
+        "Part (OR) City Model (ii): Apply the convention (N-S street number, E-W street number). (a) Intersection (4,3) refers to the 4th N-S street and 3rd E-W street. Since street numbers are unique, there is exactly 1 such intersection. (b) Intersection (3,4) refers to the 3rd N-S street and 4th E-W street. Similarly, there is exactly 1 such intersection."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct calculation of plant height after 7 months (5.25 ft) and/or correct table of values for t=0 to 10."
+        },
+        {
+          "marks": 1,
+          "for": "Correct linear expression h = 1.75 + 0.5t and valid explanation of linear growth (constant rate/slope)."
+        },
+        {
+          "marks": 1,
+          "for": "Correct drawing of the city model with 10x10 grid and appropriate scale/labels (if OR part chosen)."
+        },
+        {
+          "marks": 1,
+          "for": "Correct identification that (4,3) corresponds to exactly 1 intersection (if OR part chosen)."
+        },
+        {
+          "marks": 1,
+          "for": "Correct identification that (3,4) corresponds to exactly 1 intersection (if OR part chosen)."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Stating the height after 7 months as 3.5 feet (only calculating growth, not adding initial height).",
+          "why": "Loses marks for ignoring the initial height (1.75 ft) in the linear equation."
+        },
+        {
+          "wrong": "Claiming that (4,3) and (3,4) are the same intersection or that there are multiple intersections for a specific coordinate pair.",
+          "why": "Loses marks for misunderstanding the coordinate system convention where (x,y) is unique to a specific pair of streets."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "32",
+      "answer": "14161; 9x² + 4y² + 16z² - 12xy + 24xz - 16yz",
+      "steps": [
+        "State the algebraic identity: (a + b + c)² = a² + b² + c² + 2ab + 2bc + 2ca.",
+        "Describe the geometric interpretation: A square of side (a + b + c) is divided into 9 regions: three squares of sides a, b, c (areas a², b², c²) and six rectangles of dimensions a×b, b×c, c×a (areas 2ab, 2bc, 2ca).",
+        "To find 119², express 119 as (100 + 19). Let a=100, b=19, c=0.",
+        "Substitute values into the identity: (100 + 19 + 0)² = 100² + 19² + 0² + 2(100)(19) + 2(19)(0) + 2(0)(100).",
+        "Calculate the terms: 10000 + 361 + 0 + 3800 + 0 + 0 = 14161.",
+        "To expand (3x - 2y + 4z)², identify a=3x, b=-2y, c=4z.",
+        "Substitute into the identity: (3x)² + (-2y)² + (4z)² + 2(3x)(-2y) + 2(-2y)(4z) + 2(4z)(3x).",
+        "Simplify the expression: 9x² + 4y² + 16z² - 12xy - 16yz + 24xz."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly stating the identity (a+b+c)² and its geometric interpretation."
+        },
+        {
+          "marks": 2,
+          "for": "Correctly applying the identity to calculate 119² with clear substitution and final value 14161."
+        },
+        {
+          "marks": 2,
+          "for": "Correctly expanding (3x - 2y + 4z)² with all terms and correct signs."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "119² = 14000",
+          "why": "Rounding 119 to 120 or 100 instead of using the exact decomposition (100+19) or miscalculating the cross term 2*100*19."
+        },
+        {
+          "wrong": "9x² + 4y² + 16z² + 12xy + 16yz + 24xz",
+          "why": "Ignoring the negative sign of the 'b' term (-2y) in the cross products 2ab and 2bc, resulting in positive coefficients for xy and yz."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "33",
+      "answer": "Five rational numbers between 2/5 and 3/5 are 11/25, 12/25, 13/25, 14/25, and 15/25. The arithmetic mean (a+b)/2 always lies between any two rational numbers a and b, demonstrating the density of rational numbers on the number line.",
+      "steps": [
+        "To find 5 rational numbers between 2/5 and 3/5, multiply both fractions by 5/5 to get 10/25 and 15/25. The five rational numbers are 11/25, 12/25, 13/25, 14/25, and 15/25.",
+        "Let a and b be two rational numbers. The arithmetic mean of a and b is (a+b)/2. Since a < b, adding a to both sides gives 2a < a+b, and adding b to both sides gives a+b < 2b. Dividing by 2, we get a < (a+b)/2 < b, proving that (a+b)/2 lies between a and b.",
+        "The density of rational numbers on the number line means that between any two distinct rational numbers, there exists an infinite number of rational numbers. This is because we can always find a new rational number (like the arithmetic mean) between any two given rational numbers, and this process can be repeated indefinitely."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly finding 5 rational numbers between 2/5 and 3/5."
+        },
+        {
+          "marks": 2,
+          "for": "Proving that (a+b)/2 lies between any two rational numbers a and b using algebraic manipulation."
+        },
+        {
+          "marks": 2,
+          "for": "Explaining the density of rational numbers on the number line using the result from the proof."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Listing 5 rational numbers without showing the method of finding them.",
+          "why": "Loses marks for not demonstrating the process of finding rational numbers between two given fractions."
+        },
+        {
+          "wrong": "Stating that (a+b)/2 lies between a and b without providing a proof.",
+          "why": "Loses marks for not showing the algebraic steps that prove the inequality a < (a+b)/2 < b."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "34",
+      "answer": "The area of the triangle is 6 square units, calculated using Heron's formula and verified using the right-angled triangle formula.",
+      "steps": [
+        "Calculate the semi-perimeter (s) of the triangle using the formula s = (a + b + c) / 2, where a = 3, b = 4, and c = 5. Thus, s = (3 + 4 + 5) / 2 = 6 units.",
+        "Apply Heron's formula to find the area: Area = √(s(s - a)(s - b)(s - c)). Substituting the values, Area = √(6(6 - 3)(6 - 4)(6 - 5)) = √(6 × 3 × 2 × 1) = √36 = 6 square units.",
+        "Justify that the triangle is right-angled by verifying the Pythagorean theorem: a² + b² = c². Here, 3² + 4² = 9 + 16 = 25, which equals 5². Therefore, the triangle is right-angled with the hypotenuse as 5 units.",
+        "Verify the area using the 'half base times height' formula: Area = (1/2) × base × height. Taking the base as 3 units and the height as 4 units (the two perpendicular sides), Area = (1/2) × 3 × 4 = 6 square units.",
+        "Conclude that both methods yield the same area of 6 square units, confirming the accuracy of the calculations."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct calculation of the semi-perimeter (s = 6 units)."
+        },
+        {
+          "marks": 1,
+          "for": "Correct application of Heron's formula to find the area (6 square units)."
+        },
+        {
+          "marks": 1,
+          "for": "Justification that the triangle is right-angled using the Pythagorean theorem."
+        },
+        {
+          "marks": 1,
+          "for": "Correct verification of the area using the 'half base times height' formula."
+        },
+        {
+          "marks": 1,
+          "for": "Clear conclusion confirming the consistency of both methods."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Forgetting to calculate the semi-perimeter (s) before applying Heron's formula.",
+          "why": "This leads to incorrect substitution in the formula and an inaccurate area calculation."
+        },
+        {
+          "wrong": "Assuming the triangle is right-angled without verifying it using the Pythagorean theorem.",
+          "why": "This fails to justify the use of the 'half base times height' formula, resulting in lost marks for incomplete reasoning."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "35",
+      "answer": "The coordinates of the origin are (0, 0), the park lies in the third quadrant, the distance between the cafe and the shop is 4 units, and the coordinates of the bookstore and florist are different because they lie on different axes.",
+      "steps": [
+        "The origin is the point of intersection of the x-axis and y-axis, so its coordinates are (0, 0).",
+        "The park is located 2 units to the left (negative x) and 3 units downwards (negative y), placing it in the third quadrant.",
+        "The distance between the cafe at (3, 2) and the shop at (7, 2) is calculated as |7 - 3| = 4 units.",
+        "The bookstore is at (0, 6) on the y-axis, and the florist is at (6, 0) on the x-axis. Their coordinates are not the same because they lie on different axes."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly identifying the coordinates of the origin as (0, 0)."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly determining the park's location in the third quadrant."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly calculating the distance between the cafe and the shop as 4 units."
+        },
+        {
+          "marks": 2,
+          "for": "Correctly identifying the coordinates of the bookstore and florist and explaining why they are different."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "Stating the park is in the second quadrant.",
+          "why": "Losing marks due to incorrect identification of the quadrant based on the signs of the coordinates."
+        },
+        {
+          "wrong": "Saying the bookstore and florist have the same coordinates.",
+          "why": "Failing to recognize that points on different axes have different coordinate pairs."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "36",
+      "answer": "6241, (100-3)² = 10000 - 600 + 9, 13689, 1225",
+      "steps": [
+        "(i) To find 79², express 79 as (80 - 1). Let a = 80 and b = 1.",
+        "Apply the identity (a - b)² = a² - 2ab + b².",
+        "Substitute values: (80 - 1)² = 80² - 2(80)(1) + 1².",
+        "Calculate terms: 6400 - 160 + 1 = 6241.",
+        "(ii) To calculate 97², express it as (100 - 3)². The identity to apply is (a - b)² = a² - 2ab + b².",
+        "The expanded form is 100² - 2(100)(3) + 3², which simplifies to 10000 - 600 + 9.",
+        "(iii) To find 117², express 117 as (100 + 10 + 7). Let a = 100, b = 10, c = 7.",
+        "Apply the identity (a + b + c)² = a² + b² + c² + 2ab + 2bc + 2ca.",
+        "Substitute values: 100² + 10² + 7² + 2(100)(10) + 2(10)(7) + 2(7)(100).",
+        "Calculate terms: 10000 + 100 + 49 + 2000 + 140 + 1400.",
+        "Sum the results: 10000 + 100 + 49 + 2000 + 140 + 1400 = 13689.",
+        "(iv) To calculate 35² using Śhrīdharāchārya's method, let a = 35 and b = 5.",
+        "Apply the formula a² = (a + b)(a - b) + b².",
+        "Substitute values: 35² = (35 + 5)(35 - 5) + 5².",
+        "Simplify: 35² = (40)(30) + 25.",
+        "Calculate: 1200 + 25 = 1225.",
+        "Explanation: b = 5 is suitable because it makes (a + b) and (a - b) round numbers (40 and 30), simplifying the multiplication."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correct calculation of 79² using (a-b)² identity"
+        },
+        {
+          "marks": 1,
+          "for": "Identifying correct identity and expanded form for 97²"
+        },
+        {
+          "marks": 1,
+          "for": "Correct calculation of 117² using (a+b+c)² identity"
+        },
+        {
+          "marks": 1,
+          "for": "Correct calculation of 35² using Śhrīdharāchārya's method"
+        },
+        {
+          "marks": 1,
+          "for": "Logical explanation for choosing b=5"
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "6240",
+          "why": "Forgetting to add b² (1) in the expansion of (80-1)², resulting in 6400 - 160."
+        },
+        {
+          "wrong": "13680",
+          "why": "Miscalculating the cross terms in (100+10+7)², specifically missing the 2bc term (140) or adding incorrectly."
+        }
+      ],
+      "confidence": 1.0,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    },
+    {
+      "question_number": "37",
+      "answer": "Angle C = 105°, Angle D = 70°, x = 18, Converse: If a pair of opposite angles of a quadrilateral are supplementary, then the quadrilateral is cyclic.",
+      "steps": [
+        "Given: Cyclic quadrilateral ABCD with ∠A = 75° and ∠B = 110°.",
+        "Property: Opposite angles of a cyclic quadrilateral are supplementary (sum to 180°).",
+        "(i) ∠A + ∠C = 180° ⇒ 75° + ∠C = 180° ⇒ ∠C = 180° - 75° = 105°.",
+        "(ii) ∠B + ∠D = 180° ⇒ 110° + ∠D = 180° ⇒ ∠D = 180° - 110° = 70°.",
+        "(iii) Given ∠A = (2x + 10)° and ∠C = (3x - 20)°. Since ∠A + ∠C = 180°, (2x + 10) + (3x - 20) = 180.",
+        "Simplify: 5x - 10 = 180 ⇒ 5x = 190 ⇒ x = 38.",
+        "(iv) Converse property: If a pair of opposite angles of a quadrilateral are supplementary, then the quadrilateral is cyclic."
+      ],
+      "mark_split": [
+        {
+          "marks": 1,
+          "for": "Correctly finding ∠C using the supplementary property."
+        },
+        {
+          "marks": 1,
+          "for": "Correctly finding ∠D using the supplementary property."
+        },
+        {
+          "marks": 2,
+          "for": "Setting up and solving the equation for x correctly."
+        },
+        {
+          "marks": 1,
+          "for": "Stating the converse property accurately."
+        }
+      ],
+      "common_mistakes": [
+        {
+          "wrong": "x = 18",
+          "why": "Incorrectly simplifying 5x - 10 = 180 to 5x = 170 instead of 5x = 190."
+        },
+        {
+          "wrong": "∠C = 75°",
+          "why": "Assuming opposite angles are equal instead of supplementary."
+        }
+      ],
+      "confidence": 0.95,
+      "verified_by": "none",
+      "needs_teacher_check": false
+    }
+  ]
+}

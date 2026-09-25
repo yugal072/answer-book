@@ -35,11 +35,14 @@ def run_prototype():
     for paper_idx, paper in enumerate(papers, start=1):
         metadata = paper.get("paper_metadata", {})
         paper_id = metadata.get("paper_id", f"paper_{paper_idx}")
+        fingerprint = metadata.get("fingerprint") or paper.get("fingerprint", f"fp_{paper_id}")
+        metadata["fingerprint"] = fingerprint
         subject = metadata.get("subject", "General")
         grade = metadata.get("class", "Class 9")
         questions = paper.get("questions", [])
 
         print(f"\n[PAPER {paper_idx}/{len(papers)}] {paper_id.upper()} — {subject} ({grade})")
+        print(f"Fingerprint: {fingerprint}")
         print(f"Total Questions to solve: {len(questions)}")
         print("=" * 80)
 
@@ -81,6 +84,8 @@ def run_prototype():
         output_file = output_dir / f"{paper_id}.json"
         solved_payload = {
             "paper_id": paper_id,
+            "fingerprint": fingerprint,
+            "status": "ready",
             "metadata": metadata,
             "total_questions": len(solved_paper_solutions),
             "solutions": solved_paper_solutions,
