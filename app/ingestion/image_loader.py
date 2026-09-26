@@ -84,7 +84,8 @@ Rules:
 14. If the question offers an internal choice (an "OR" alternative), set choice_group to the question number; otherwise use null.
 15. Extract paper metadata when visible: subject, class, and board.
 16. Use null when any metadata cannot be determined.
-17. Return ONLY the requested JSON object, no markdown fences, no commentary.
+17. Phone photos may be skewed, rotated, shadowed or slightly blurred. Read carefully anyway; use null and low confidence for what is truly unreadable instead of guessing.
+18. Return ONLY the requested JSON object, no markdown fences, no commentary.
 
 Required JSON shape:
 {
@@ -163,7 +164,14 @@ def load_image_bytes(path: str | Path) -> bytes:
 
 
 def _prepare(image: Image.Image) -> Image.Image:
-    """Lightweight normalization: orientation, downscale-if-huge, gentle contrast."""
+    """Lightweight normalization for scans and phone photos.
+
+    Orientation, downscale-if-huge, gentle contrast, mild sharpening
+    (helps slightly blurred phone photos; harmless on clean scans).
+    Never upscales, never binarizes.
+    """
+    from PIL import ImageFilter
+
     image = ImageOps.exif_transpose(image).convert("RGB")
     w, h = image.size
     longest = max(w, h)
@@ -171,7 +179,8 @@ def _prepare(image: Image.Image) -> Image.Image:
         scale = VISION_RENDER_MAX_DIM / longest
         image = image.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
     image = ImageEnhance.Contrast(image).enhance(1.15)
-    return ImageOps.autocontrast(image, cutoff=0.5)
+    image = ImageOps.autocontrast(image, cutoff=0.5)
+    return image.filter(ImageFilter.UnsharpMask(radius=2, percent=70, threshold=3))
 
 
 def _pil_to_data_url(image: Image.Image) -> str:
@@ -401,7 +410,11 @@ def _merge_tile_questions(top: list[dict], bottom: list[dict]) -> list[dict]:
 def _extract_page(
     image: Image.Image, source_page: int, model: str
 ) -> tuple[list[dict], dict]:
-    """Extract one page; tile-split with overlap only on token-budget overflow."""
+    """Extract one page; tile-split with overlap only on token-budget overflow.
+
+    A tile that itself overflows is split once more (depth 2 max); merges
+    reuse the lossless overlap logic, so boundary options always survive.
+    """
     try:
         return _extract_data_url(_pil_to_data_url(image), source_page, model)
     except TruncationError:
@@ -414,14 +427,35 @@ def _extract_page(
         split = _find_split_row(image)
         tiles = [image.crop((0, 0, w, split + overlap)),
                  image.crop((0, split - overlap, w, h))]
-        top, top_metadata = _extract_data_url(
-            _pil_to_data_url(tiles[0]), source_page, model
-        )
-        bottom, bottom_metadata = _extract_data_url(
-            _pil_to_data_url(tiles[1]), source_page, model
-        )
-        metadata = {**bottom_metadata, **top_metadata}
-        return _merge_tile_questions(top, bottom), metadata
+        return _extract_tile_list(tiles, source_page, model, _depth=0)
+
+
+def _extract_tile_list(tiles, source_page: int, model: str, _depth: int):
+    merged_qs: list[dict] = []
+    tile_metas: list[dict] = []
+    for tile in tiles:
+        try:
+            tile_result, tile_meta = _extract_data_url(
+                _pil_to_data_url(tile), source_page, model
+            )
+        except TruncationError:
+            if _depth >= 1 or tile.size[1] < MIN_TILE_HEIGHT:
+                raise
+            log.info("Tile overflowed; splitting again (depth %d).", _depth + 1)
+            w, h = tile.size
+            overlap = int(h * TILE_OVERLAP)
+            split = _find_split_row(tile)
+            sub = [tile.crop((0, 0, w, split + overlap)),
+                   tile.crop((0, split - overlap, w, h))]
+            tile_result, tile_meta = _extract_tile_list(sub, source_page, model, _depth + 1)
+        tile_metas.append(tile_meta)
+        merged_qs = _merge_tile_questions(merged_qs, tile_result)
+    merged_meta: dict = {}
+    for meta in tile_metas:
+        for k, v in (meta or {}).items():
+            if v and k not in merged_meta:
+                merged_meta[k] = v
+    return merged_qs, merged_meta
 
 def assemble_paper(
     questions: list[Question],

@@ -42,6 +42,32 @@ def extract_pdf_pages(file_path: Path) -> list[list[str]]:
     return pages
 
 
+# Paper header metadata (subject/class/board) from the text layer, so PDF
+# ingestion produces the same Paper fields as image ingestion. Anything not
+# found stays None; values are never invented.
+def extract_paper_metadata(pages: list[list[str]]) -> dict:
+    meta: dict = {}
+
+    for lines in pages:
+        for line in lines:
+            subject_match = re.search(r"Subject:\s*([^|]+)", line)
+            if subject_match and "subject" not in meta:
+                meta["subject"] = subject_match.group(1).strip() or None
+
+            class_match = re.search(r"Class:\s*([^|]+)", line)
+            if class_match and "class" not in meta:
+                meta["class"] = class_match.group(1).strip() or None
+
+            board_match = re.search(r"\|\s*([A-Z]{2,10})\s*$", line)
+            if board_match and "board" not in meta:
+                meta["board"] = board_match.group(1).strip()
+
+        if len(meta) == 3:
+            break
+
+    return {k: v for k, v in meta.items() if v}
+
+
 # Parse questions from the text 
 def parse_questions(pages: list[list[str]]) -> list[Question]:
     records = []
@@ -260,6 +286,8 @@ def ingest_paper(file_path: Path) -> Paper:
 
     pages = extract_pdf_pages(file_path)
 
+    metadata = extract_paper_metadata(pages)
+
     questions = parse_questions(pages)
 
     sections = list(
@@ -279,6 +307,9 @@ def ingest_paper(file_path: Path) -> Paper:
         paper_id=paper_id,
         fingerprint=fingerprint,
         status="ready",
+        subject=metadata.get("subject"),
+        class_name=metadata.get("class"),
+        board=metadata.get("board"),
         questions=questions,
         total_questions=len(questions),
         total_marks=total_marks,
