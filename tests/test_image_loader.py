@@ -105,3 +105,34 @@ def test_paper_assembly_convention():
     assert paper.status == "ready"
     assert (paper.total_questions, paper.total_marks) == (2, 5)
     assert il.to_langgraph_questions(paper)[0]["number"] == "1"
+
+
+def test_nested_tiling_recovers_after_tile_truncation(monkeypatch):
+    """A tile that overflows is split again (depth 2 max); results merge."""
+    from PIL import Image
+
+    calls = []
+
+    def fake_data_url(data_url, source_page, model):
+        calls.append(source_page)
+        if len(calls) <= 2:
+            raise il.TruncationError("overflow at full page and first tile")
+        n = len(calls)
+        return ([_qd(question_number=str(n),
+                     question_text=f"Tile question {n}")],
+                {})
+
+    monkeypatch.setattr(il, "_extract_data_url", fake_data_url)
+    img = Image.new("RGB", (600, 1600), "white")
+    items, _ = il._extract_page(img, 1, "test-model")
+    assert len(items) >= 2
+    assert len(calls) == 5  # full + tile + 2 sub-tiles + second tile; capped depth
+
+
+def test_prepare_handles_photo_sized_image():
+    from PIL import Image
+
+    img = Image.new("RGB", (800, 1200), "white")
+    out = il._prepare(img)
+    assert out.size == (800, 1200)
+    assert out.mode == "RGB"
