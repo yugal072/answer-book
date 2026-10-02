@@ -28,6 +28,7 @@ import io
 import json
 import logging
 import os
+import re
 import statistics
 import time
 from pathlib import Path
@@ -35,6 +36,14 @@ from typing import Optional
 
 from PIL import Image, ImageEnhance, ImageOps
 
+from app.ingestion.errors import (
+    DocumentError,
+    ExtractionError,
+    IngestionError,
+    TruncationError,
+    ValidationError,
+)
+from app.ingestion.validation import raise_if_invalid, validate_paper
 from app.models.loaders_models import Paper, Question
 
 log = logging.getLogger(__name__)
@@ -47,6 +56,10 @@ VISION_RENDER_MAX_DIM = int(os.environ.get("VISION_RENDER_MAX_DIM", "2048"))
 GROQ_TIMEOUT_S = float(os.environ.get("GROQ_TIMEOUT_S", "60"))
 
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+#: PIL format names accepted by the bytes entry point. A file whose extension
+#: lies (a PNG named .jpg is fine; a GIF is not) is rejected with a clear
+#: message instead of being sent to the model.
+_PIL_FORMATS = {"PNG", "JPEG", "WEBP"}
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
 
 TILE_OVERLAP = 0.25
@@ -119,16 +132,33 @@ USER_PROMPT = (
 VALID_QTYPES = set(TYPE_MAP)
 
 
-class ImageError(ValueError):
-    pass
+class ImageError(DocumentError, ValueError):
+    """Unusable image input (missing, empty, unsupported, corrupt, huge).
+
+    Subclasses ``ValueError`` as well, so any caller that used to catch
+    ``ValueError`` around this module keeps working.
+    """
 
 
-class ExtractionError(RuntimeError):
-    pass
-
-
-class TruncationError(ExtractionError):
-    """Model output hit the token budget; partial data is never returned silently."""
+# ``ExtractionError`` and ``TruncationError`` are imported from
+# app.ingestion.errors and re-exported here, so the historical
+# ``image_loader.ExtractionError`` name keeps working and is now part of the
+# shared ingestion hierarchy (``IngestionError``).
+__all__ = [
+    "ImageError",
+    "ExtractionError",
+    "TruncationError",
+    "IngestionError",
+    "ValidationError",
+    "load_image_bytes",
+    "parse_and_validate",
+    "to_canonical",
+    "assemble_paper",
+    "extract_paper_from_image_file",
+    "extract_paper_from_image_bytes",
+    "extract_paper_from_images",
+    "to_langgraph_questions",
+]
 
 
 def _api_key() -> str:
@@ -146,9 +176,11 @@ def load_image_bytes(path: str | Path) -> bytes:
     p = Path(path)
     if not p.exists():
         raise ImageError(f"Image not found: {path}")
+    if not p.is_file():
+        raise ImageError(f"Not a file: {path}")
     if p.suffix.lower() not in SUPPORTED_EXTENSIONS:
         raise ImageError(
-            f"Unsupported image type '{p.suffix}'. Supported: {sorted(SUPPORTED_EXTENSIONS)}"
+            f"Unsupported image type '{p.suffix or '(none)'}'. Supported: {sorted(SUPPORTED_EXTENSIONS)}"
         )
     raw = p.read_bytes()
     if not raw:
@@ -161,6 +193,32 @@ def load_image_bytes(path: str | Path) -> bytes:
     except Exception as e:
         raise ImageError(f"Invalid/corrupt image {path}: {e}") from e
     return raw
+
+
+def open_image(data: bytes, origin: str = "image bytes") -> Image.Image:
+    """Decode image bytes into RGB, with actionable errors.
+
+    Used by the bytes entry point, which previously let PIL's own
+    exceptions escape as if they were extraction failures.
+    """
+    if not data:
+        raise ImageError(f"Empty image ({origin})")
+    if len(data) > MAX_IMAGE_BYTES:
+        raise ImageError(
+            f"Image too large ({len(data) / 1e6:.1f} MB, limit "
+            f"{MAX_IMAGE_BYTES / 1e6:.0f} MB): {origin}"
+        )
+    try:
+        image = Image.open(io.BytesIO(data))
+        image.load()
+    except Exception as e:
+        raise ImageError(f"Invalid/corrupt image ({origin}): {e}") from e
+    if image.format and image.format.upper() not in _PIL_FORMATS:
+        raise ImageError(
+            f"Unsupported image format {image.format} ({origin}). "
+            f"Supported: PNG, JPEG, WEBP."
+        )
+    return image.convert("RGB")
 
 
 def _prepare(image: Image.Image) -> Image.Image:
@@ -286,8 +344,18 @@ def to_canonical(qd: dict) -> Question:
     )
 
 
+_TOKEN_BUDGET_EXHAUSTED = re.compile(
+    r"tokens per day|\bTPD\b|requests per day|\bRPD\b|monthly", re.IGNORECASE
+)
+
+
 def _vision_call(data_url: str, model: str) -> tuple[str, str]:
-    """One Groq vision call -> (content, finish_reason), with transport retries."""
+    """One Groq vision call -> (content, finish_reason), with transport retries.
+
+    Retries transport errors and short-window rate limits. A *daily* token
+    or request limit is not retried: waiting cannot help, and the caller
+    gets an actionable message instead of a slow, confusing failure.
+    """
     from groq import APIConnectionError, APITimeoutError, Groq, RateLimitError
 
     client = Groq(api_key=_api_key(), timeout=GROQ_TIMEOUT_S)
@@ -308,20 +376,48 @@ def _vision_call(data_url: str, model: str) -> tuple[str, str]:
                 ],
             )
             break
-        except (RateLimitError, APITimeoutError, APIConnectionError) as e:
+        except RateLimitError as e:
+            detail = str(e)
+            if _TOKEN_BUDGET_EXHAUSTED.search(detail):
+                raise ExtractionError(
+                    f"Groq daily token/request budget exhausted for {model}: "
+                    f"{detail}. No retry is attempted because waiting will not "
+                    f"help; retry after the quota resets or raise the limit."
+                ) from e
             last_err = e
-            wait = 10 * attempt if isinstance(e, RateLimitError) else 2 * attempt
-            log.warning("Groq transient error (attempt %d): %s; waiting %ss",
-                        attempt, type(e).__name__, wait)
+            log.warning("Groq rate limit (attempt %d); waiting 10s", attempt)
+            time.sleep(10 * attempt)
+        except (APITimeoutError, APIConnectionError) as e:
+            last_err = e
+            wait = 2 * attempt
+            log.warning(
+                "Groq transient error (attempt %d): %s; waiting %ss",
+                attempt, type(e).__name__, wait,
+            )
             time.sleep(wait)
     else:
         raise ExtractionError(f"Groq API transport failure after retry: {last_err}")
-    content = resp.choices[0].message.content or ""
+
+    choice = resp.choices[0]
+    content = choice.message.content or ""
+    finish = choice.finish_reason
+
+    if finish == "length":
+        # Never return partial output: the caller re-reads the page as tiles.
+        raise TruncationError(
+            "Model output hit the token budget "
+            f"({VISION_MAX_TOKENS} tokens)."
+        )
+    if finish not in (None, "stop", "tool_calls"):
+        raise ExtractionError(
+            f"Model stopped for an unexpected reason: {finish}"
+        )
     if not content.strip():
-        raise ExtractionError("Model returned an empty response")
-    if resp.choices[0].finish_reason == "length":
-        raise TruncationError("Model output hit the token budget.")
-    return content, resp.choices[0].finish_reason
+        raise ExtractionError(
+            "Model returned an empty response for this page; the image may be "
+            "blank, rotated beyond recognition, or unreadable."
+        )
+    return content, finish
 
 
 def _extract_data_url(
@@ -347,6 +443,13 @@ def _extract_data_url(
 
     items = parse_and_validate(content, default_page=source_page)
 
+    # The page a question came from is known for certain here: it is the
+    # image that was just read. A model-reported page number is never
+    # trusted over that, because a wrong page silently corrupts every
+    # downstream page reference.
+    for item in items:
+        item["source_page"] = source_page
+
     return items, metadata
 
 def _find_split_row(image: Image.Image, search_radius: int = 120) -> int:
@@ -370,41 +473,141 @@ def _find_split_row(image: Image.Image, search_radius: int = 120) -> int:
     return best
 
 
+def _merge_options(base: list, extra: list) -> list:
+    """Union two option lists, order-preserving, de-duplicated by label.
+
+    Two tiles of the same page overlap, and the model may transcribe the
+    same option slightly differently in each ("(C) -1" vs "(C) −1"). The
+    first spelling wins - nothing is rewritten - but the option is kept
+    once, so an MCQ never grows eight options out of four.
+    """
+    merged = list(base)
+    by_label = {}
+    for option in merged:
+        label = _option_label(option)
+        if label:
+            by_label.setdefault(label, option)
+    for option in extra:
+        label = _option_label(option)
+        if label and label in by_label:
+            continue
+        merged.append(option)
+        if label:
+            by_label[label] = option
+    return merged
+
+
+def _option_label(option: str) -> str:
+    match = re.match(r"^\s*\(([A-Za-z])\)", option or "")
+    return match.group(1).upper() if match else ""
+
+
+def _dedupe_key(item: dict) -> tuple:
+    """Identity of a vision question for cross-tile/cross-page dedupe."""
+    return (
+        str(item.get("question_number", "")).strip(),
+        re.sub(r"\s+", " ", str(item.get("question_text", ""))).strip()[:200],
+    )
+
+
+def _confidences(items: list) -> dict:
+    """Question number -> vision confidence, for low-confidence reporting."""
+    return {
+        str(item.get("question_number", "")).strip(): item["confidence"]
+        for item in items
+        if isinstance(item.get("confidence"), (int, float))
+    }
+
+
 def _merge_tile_questions(top: list[dict], bottom: list[dict]) -> list[dict]:
     """Merge two same-page tile extractions without losing boundary content.
 
     Identical repeats dedupe; straddling questions reassemble in reading
-    order; options union order-preservingly so an option seen by either tile
-    always survives. Text concatenates only for genuinely disjoint fragments.
+    order; options union by label so an option seen by either tile always
+    survives but is never duplicated. Text concatenates only for genuinely
+    disjoint fragments.
     """
     merged: list[dict] = []
-    seen: set[tuple] = set()
-    by_number: dict[str, dict] = {}
+    seen: set = set()
+    by_number: dict = {}
     for q in list(top) + list(bottom):
-        key = (q["question_number"].strip(), q["question_text"].strip()[:200],
-               tuple(q["options"]))
+        key = (
+            str(q.get("question_number", "")).strip(),
+            str(q.get("question_text", "")).strip()[:200],
+            tuple(q.get("options") or []),
+        )
         if key in seen:
             continue
         seen.add(key)
-        prev = by_number.get(q["question_number"].strip())
+        number = str(q.get("question_number", "")).strip()
+        prev = by_number.get(number)
         if prev is not None:
-            for o in q["options"]:
-                if o not in prev["options"]:
-                    prev["options"].append(o)
-            if prev["question_text"] != q["question_text"]:
+            prev["options"] = _merge_options(
+                prev.get("options") or [], q.get("options") or []
+            )
+            if prev.get("question_text") != q.get("question_text"):
                 a, b = prev["question_text"], q["question_text"]
                 prev["question_text"] = max(a, b, key=len) if (a in b or b in a) \
                     else f"{a} {b}".strip()
-            if prev["marks"] is None:
-                prev["marks"] = q["marks"]
-            prev["confidence"] = min(prev["confidence"], q["confidence"])
-            if not prev["section"] and q["section"]:
+            if prev.get("marks") is None:
+                prev["marks"] = q.get("marks")
+            prev["confidence"] = min(
+                prev.get("confidence", 0.0), q.get("confidence", 0.0)
+            )
+            if not prev.get("section") and q.get("section"):
                 prev["section"] = q["section"]
-            prev["has_figure"] = prev["has_figure"] or q["has_figure"]
+            prev["has_figure"] = bool(
+                prev.get("has_figure") or q.get("has_figure")
+            )
             continue
-        by_number[q["question_number"].strip()] = q
+        by_number[number] = q
         merged.append(q)
     return merged
+
+
+def _text_key(item: dict) -> tuple:
+    """Normalised identity of a question's wording, for dedupe.
+
+    Overlapping tiles routinely report the same question twice with
+    different numbering ("1(i)" in one tile, "i" in the next), so
+    identity cannot rest on the number alone. The page is part of the
+    key: a question repeated on two *different* pages is not a tiling
+    artefact and is left alone.
+    """
+    text = re.sub(
+        r"\s+", " ", str(item.get("question_text", ""))
+    ).strip().lower()
+    return (item.get("source_page"), re.sub(r"[^a-z0-9]+", "", text)[:160])
+
+
+def _dedupe_by_text(items: list[dict]) -> list[dict]:
+    """Drop a question that repeats an earlier one verbatim.
+
+    The first occurrence wins, so the numbering that reads in document
+    order is kept; options and marks from the repeat are merged in rather
+    than thrown away.
+    """
+    kept: list[dict] = []
+    by_key: dict = {}
+    for item in items:
+        key = _text_key(item)
+        if not key:
+            kept.append(item)
+            continue
+        previous = by_key.get(key)
+        if previous is None:
+            by_key[key] = item
+            kept.append(item)
+            continue
+        previous["options"] = _merge_options(
+            previous.get("options") or [], item.get("options") or []
+        )
+        if previous.get("marks") is None:
+            previous["marks"] = item.get("marks")
+        previous["confidence"] = min(
+            previous.get("confidence", 0.0), item.get("confidence", 0.0)
+        )
+    return kept
 
 
 def _extract_page(
@@ -416,7 +619,10 @@ def _extract_page(
     reuse the lossless overlap logic, so boundary options always survive.
     """
     try:
-        return _extract_data_url(_pil_to_data_url(image), source_page, model)
+        items, metadata = _extract_data_url(
+            _pil_to_data_url(image), source_page, model
+        )
+        return _dedupe_by_text(items), metadata
     except TruncationError:
         if image.size[1] < MIN_TILE_HEIGHT:
             raise
@@ -427,7 +633,10 @@ def _extract_page(
         split = _find_split_row(image)
         tiles = [image.crop((0, 0, w, split + overlap)),
                  image.crop((0, split - overlap, w, h))]
-        return _extract_tile_list(tiles, source_page, model, _depth=0)
+        items, metadata = _extract_tile_list(
+            tiles, source_page, model, _depth=0
+        )
+        return _dedupe_by_text(items), metadata
 
 
 def _extract_tile_list(tiles, source_page: int, model: str, _depth: int):
@@ -463,12 +672,19 @@ def assemble_paper(
     metadata: dict | None = None,
     status: str = "ready",
 ) -> Paper:
-    """Assemble a canonical Paper (same paper_id/fingerprint convention as PDF ingestion)."""
+    """Assemble a canonical Paper (same paper_id/fingerprint convention as PDF ingestion).
+
+    ``total_marks`` is the sum only when *every* question has a known marks
+    value. A partial sum would silently understate the paper, so it is
+    reported as unknown instead - the same rule the PDF path uses.
+    """
     h = hashlib.sha256()
     for b in source_bytes:
         h.update(b)
     fingerprint = h.hexdigest() if source_bytes else hashlib.sha256(b"").hexdigest()
     sections = list(dict.fromkeys(q.section for q in questions if q.section))
+    known = [q.marks for q in questions if q.marks is not None]
+    total_marks = sum(known) if questions and len(known) == len(questions) else None
     return Paper(
         paper_id=f"pap_{fingerprint[:8]}",
         fingerprint=fingerprint,
@@ -478,61 +694,118 @@ def assemble_paper(
         board=metadata.get("board") if metadata else None,
         questions=questions,
         total_questions=len(questions),
-        total_marks=sum(q.marks or 0 for q in questions) or None,
+        total_marks=total_marks,
         sections=sections,
     )
 
 
-def extract_paper_from_image_bytes(data: bytes, source_page: int = 1,
-                                   model: str | None = None) -> Paper:
+def _merge_metadata(target: dict, extra: dict | None) -> dict:
+    """First non-empty value per key wins; metadata is never overwritten
+    with a blank and never invented."""
+    for key, value in (extra or {}).items():
+        if value and not target.get(key):
+            target[key] = value
+    return target
+
+
+def extract_paper_from_image_bytes(
+    data: bytes,
+    source_page: int = 1,
+    model: str | None = None,
+    diagnostics: Optional[list] = None,
+) -> Paper:
     """Image bytes -> canonical Paper."""
-    image = Image.open(io.BytesIO(data)).convert("RGB")
+    if not isinstance(source_page, int) or source_page < 1:
+        raise ImageError(f"Invalid page number: {source_page!r}")
+    image = open_image(data, "image bytes")
     items, metadata = _extract_page(
         image, source_page, model or EXTRACTION_MODEL
     )
-    return assemble_paper(
+    paper = assemble_paper(
         [to_canonical(q) for q in items], [data], metadata
     )
+    report = validate_paper(
+        paper, source="image", total_pages=source_page,
+        confidences=_confidences(items),
+    )
+    if diagnostics is not None:
+        diagnostics.extend(report.diagnostics)
+    raise_if_invalid(report, context="image ingestion")
+    return paper
 
-def extract_paper_from_image_file(path: str | Path, page_number: int = 1,
-                                  model: str | None = None) -> Paper:
+
+def extract_paper_from_image_file(
+    path: str | Path,
+    page_number: int = 1,
+    model: str | None = None,
+    diagnostics: Optional[list] = None,
+) -> Paper:
     """Image file (PNG/JPEG/WebP) -> canonical Paper."""
     raw = load_image_bytes(path)
-    image = Image.open(io.BytesIO(raw)).convert("RGB")
+    image = open_image(raw, str(path))
     items, metadata = _extract_page(
         image, page_number, model or EXTRACTION_MODEL
     )
-    for q in items:
-        q["source_page"] = page_number
-    return assemble_paper(
+    paper = assemble_paper(
         [to_canonical(q) for q in items], [raw], metadata
     )
+    report = validate_paper(
+        paper, source="image", total_pages=page_number,
+        confidences=_confidences(items),
+    )
+    if diagnostics is not None:
+        diagnostics.extend(report.diagnostics)
+    raise_if_invalid(report, context=f"image ingestion of {Path(path).name}")
+    return paper
 
-def extract_paper_from_images(paths: list[str | Path],
-                              model: str | None = None) -> Paper:
-    """Multiple image pages -> one canonical Paper, page numbers preserved."""
+
+def extract_paper_from_images(
+    paths: list[str | Path],
+    model: str | None = None,
+    diagnostics: Optional[list] = None,
+) -> Paper:
+    """Multiple image pages -> one canonical Paper, page numbers preserved.
+
+    Metadata is merged across pages (first non-empty value per key), so a
+    subject printed only on the first photo is not lost when page 1 of the
+    model response happened to omit it. A question repeated across two
+    overlapping photos is kept once.
+    """
+    if not paths:
+        raise ImageError("No images given: pass at least one image path.")
+
     model = model or EXTRACTION_MODEL
     merged: list[dict] = []
-    seen: set[tuple] = set()
+    seen: set = set()
     sources: list[bytes] = []
     metadata: dict = {}
     for idx, p in enumerate(paths, start=1):
         raw = load_image_bytes(p)
         sources.append(raw)
-        image = Image.open(io.BytesIO(raw)).convert("RGB")
+        image = open_image(raw, str(p))
         items, page_metadata = _extract_page(image, idx, model)
-        if not metadata:
-            metadata = page_metadata
+        _merge_metadata(metadata, page_metadata)
+        if not items:
+            log.warning("Page %d (%s) produced no questions", idx, Path(p).name)
         for q in items:
             q["source_page"] = idx
-            key = (q["question_number"].strip(), q["question_text"].strip()[:200])
+            key = _dedupe_key(q)
             if key in seen:
                 continue
             seen.add(key)
             merged.append(q)
-    return assemble_paper(
-        [to_canonical(q) for q in merged], sources, metadata
+
+    paper = assemble_paper(
+        [to_canonical(q) for q in _dedupe_by_text(merged)], sources, metadata
     )
+    report = validate_paper(
+        paper, source="image", total_pages=len(paths),
+        confidences=_confidences(merged),
+    )
+    if diagnostics is not None:
+        diagnostics.extend(report.diagnostics)
+    raise_if_invalid(report, context="multi-page image ingestion")
+    return paper
 
 def to_langgraph_questions(paper: Paper) -> list[dict]:
     """Canonical questions as plain dicts for the solve graph / answer stage."""

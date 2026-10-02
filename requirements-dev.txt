@@ -1,0 +1,5 @@
+# Development / test dependencies (in addition to requirements.txt).
+# The runtime itself needs none of these.
+pytest>=7.0
+# Only used by the live vision tests, to render a paper page to an image.
+pymupdf>=1.23

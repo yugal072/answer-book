@@ -11,6 +11,17 @@ class Question(BaseModel):
     has_figure: bool = False
     page: Optional[int]= None
     choice_group: Optional[str] = None
+    # Optional, additive (default None) so existing producers/callers keep
+    # working. Both are only set when the source document actually states
+    # them - they are never guessed.
+    #: Full section heading, e.g. "Literature (Very Short Answer)" for
+    #: "Section B - Literature (Very Short Answer)". `section` keeps the
+    #: short label ("B") used downstream.
+    section_title: Optional[str] = None
+    #: Chapter/topic tag printed under a question, e.g.
+    #: "Ch 4: Exploring Algebraic Identities". The solve graph already reads
+    #: a `chapter` key from question dicts; this makes it real.
+    chapter: Optional[str] = None
     
 class Paper(BaseModel):
     paper_id: str
