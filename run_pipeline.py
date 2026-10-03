@@ -1,10 +1,12 @@
-"""Main Pipeline Orchestrator: Connects Ingestion (Role 1) to LangGraph Solving (Role 2).
+"""Main Pipeline Orchestrator: Connects Ingestion (Role 1) to LangGraph Solving (Role 2)
+with PostgreSQL persistence, Recommendation A paper caching, and atomic checkpointing.
 
 Usage:
-    python main.py <path_to_paper> [--limit N] [--subject SUBJECT] [--class-name CLASS]
+    python main.py <path_to_paper> [--limit N] [--subject SUBJECT] [--class-name CLASS] [--export-json]
 
 Examples:
     python main.py test_papers/question_paper_455.pdf --limit 3
+    python main.py test_papers/question_paper_455.pdf --export-json
     python main.py test_papers/question_paper_463.pdf
 """
 
@@ -13,6 +15,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Ensure UTF-8 output on Windows terminal
 if sys.platform == "win32":
@@ -20,27 +23,69 @@ if sys.platform == "win32":
 
 from app.ingestion.paper_loader import ingest_paper
 from app.generate.graph import solve_question
+from app.tools import (
+    check_paper_cache,
+    generate_paper_fingerprint,
+    generate_question_signature,
+    get_paper_resume_info,
+    mark_paper_status,
+    save_question_checkpoint,
+    upsert_paper_record,
+)
 
 
 def run_pipeline(
     file_path: Path,
-    limit: int = None,
-    subject: str = None,
-    class_name: str = None,
+    limit: Optional[int] = None,
+    subject: Optional[str] = None,
+    class_name: Optional[str] = None,
     board: str = "CBSE",
     output_dir: Path = Path("solutionPapers"),
-) -> Path:
-    """Runs the end-to-end pipeline from raw paper file to verified Solution Book JSON."""
+    export_json: bool = False,
+) -> Dict[str, Any]:
+    """Runs the end-to-end pipeline from raw paper file to verified Solution Book."""
 
     if not file_path.exists():
         print(f"[ERROR] File not found: {file_path}")
         sys.exit(1)
 
     print("=" * 80)
-    print("      ANSWER BOOK — END-TO-END PIPELINE (INGESTION -> LANGGRAPH)")
+    print("      ANSWER BOOK — END-TO-END PIPELINE (WITH DB PERSISTENCE & CACHE)")
     print("=" * 80)
 
     total_start_time = time.time()
+
+    # --------------------------------------------------------------------------
+    # Step 0: Pre-Flight Paper Cache Check (Recommendation A)
+    # --------------------------------------------------------------------------
+    raw_fingerprint = generate_paper_fingerprint(file_path)
+    print(f"\n[CACHE PRE-FLIGHT] Checking PostgreSQL database for fingerprint: {raw_fingerprint[:12]}...")
+
+    # If no limit is requested, check if the full paper is already solved in the DB
+    if not limit:
+        cached_paper = check_paper_cache(raw_fingerprint)
+        if cached_paper:
+            total_elapsed = time.time() - total_start_time
+            print("=" * 80)
+            print("  [CACHE HIT] Paper already fully solved in PostgreSQL! (0 LLM API calls)")
+            print("=" * 80)
+            print(f"  • Paper ID        : {cached_paper['paper_id']}")
+            print(f"  • Fingerprint     : {cached_paper['fingerprint']}")
+            print(f"  • Total Solved    : {len(cached_paper['solutions'])} questions")
+            print(f"  • Status          : {cached_paper['status']}")
+            print(f"  • Response Time   : {total_elapsed:.4f} seconds")
+
+            if export_json:
+                output_dir.mkdir(parents=True, exist_ok=True)
+                out_file = output_dir / f"{cached_paper['paper_id']}.json"
+                with open(out_file, "w", encoding="utf-8") as f:
+                    json.dump(cached_paper, f, indent=2, ensure_ascii=False)
+                print(f"  • Exported JSON   : {out_file.resolve()}")
+
+            print("=" * 80)
+            return cached_paper
+
+    print("  • Cache status    : Miss / Processing required")
 
     # --------------------------------------------------------------------------
     # Step 1: Ingestion (Role 1)
@@ -70,8 +115,22 @@ def run_pipeline(
     print(f"  • Subject / Grade : {resolved_subject} ({resolved_class}, {resolved_board})")
     print("-" * 80)
 
+    # Upsert paper entry in PostgreSQL with status 'solving'
+    upsert_paper_record(
+        paper_id=paper.paper_id,
+        fingerprint=paper.fingerprint,
+        status="solving",
+        subject=resolved_subject,
+        class_name=resolved_class,
+        board=resolved_board,
+        total_questions=paper.total_questions,
+        total_marks=paper.total_marks,
+        sections=paper.sections,
+        source_file=str(file_path),
+    )
+
     # --------------------------------------------------------------------------
-    # Step 2: Solving & Verification (Role 2 — LangGraph)
+    # Step 2: Crash Recovery & Solving (Role 2 — LangGraph)
     # --------------------------------------------------------------------------
     questions_to_solve = paper.questions
     if limit and limit > 0:
@@ -79,6 +138,14 @@ def run_pipeline(
         print(f"\n[PHASE 2: SOLVING] Solving first {limit} of {len(paper.questions)} questions...")
     else:
         print(f"\n[PHASE 2: SOLVING] Solving all {len(questions_to_solve)} questions...")
+
+    # Check for previously saved checkpoints in PostgreSQL
+    existing_solutions, solved_numbers = get_paper_resume_info(paper.paper_id)
+    solved_map = {sol["question_number"]: sol for sol in existing_solutions}
+
+    if solved_numbers:
+        print(f"\n[RESUME MODE] Found {len(solved_numbers)} previously saved questions in database!")
+        print(f"             Pre-loaded: {sorted(list(solved_numbers))}")
 
     paper_metadata = {
         "paper_id": paper.paper_id,
@@ -92,26 +159,36 @@ def run_pipeline(
     solved_solutions = []
 
     for idx, q in enumerate(questions_to_solve, start=1):
-        q_num = q.number
+        q_num = str(q.number)
         q_type = q.type
         marks = q.marks or 1
         prompt_snippet = q.text[:95] + "..." if len(q.text) > 95 else q.text
+
+        # 1. Skip if already solved in a previous run (Crash Recovery)
+        if q_num in solved_map:
+            print(f"\n>>> [{idx}/{len(questions_to_solve)}] Q{q_num} [ALREADY SOLVED IN DB - SKIPPED]")
+            solved_solutions.append(solved_map[q_num])
+            continue
 
         print(f"\n>>> [{idx}/{len(questions_to_solve)}] Q{q_num} [{q_type.upper()}, {marks} Mark(s)]:")
         print(f"    Text: {prompt_snippet}")
 
         q_start = time.time()
         try:
-            # Call LangGraph Question Solve Engine
+            # Call LangGraph Question Solve Engine (checks question signature cache internally)
             solution = solve_question(q.model_dump(), paper_metadata)
             elapsed = time.time() - q_start
+
+            # 2. Atomic Question Checkpoint: commit immediately to PostgreSQL
+            sig = generate_question_signature(q.text, marks, resolved_board, resolved_class)
+            save_question_checkpoint(paper.paper_id, sig, q.model_dump(), solution)
 
             solved_solutions.append(solution)
 
             print(f"    [Time: {elapsed:.2f}s | Confidence: {solution['confidence']:.2f} | Teacher Check: {solution['needs_teacher_check']}]")
             print(f"    ANSWER: {solution['answer']}")
             print(f"    STEPS ({len(solution.get('steps', []))} steps):")
-            for s in solution.get("steps", [])[:3]:  # print up to first 3 steps
+            for s in solution.get("steps", [])[:3]:
                 print(f"      • {s}")
             if len(solution.get("steps", [])) > 3:
                 print(f"      • ... ({len(solution.get('steps', [])) - 3} more steps)")
@@ -120,15 +197,18 @@ def run_pipeline(
             print(f"    [ERROR solving Q{q_num}]: {e}")
 
     # --------------------------------------------------------------------------
-    # Step 3: Assembly & Output (Saving Solution Book)
+    # Step 3: Assembly & Status Finalization
     # --------------------------------------------------------------------------
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / f"{paper.paper_id}.json"
+    is_fully_solved = len(solved_solutions) == len(paper.questions)
+    final_status = "ready" if is_fully_solved else "partial"
+
+    if is_fully_solved:
+        mark_paper_status(paper.paper_id, "ready")
 
     solved_payload = {
         "paper_id": paper.paper_id,
         "fingerprint": paper.fingerprint,
-        "status": "ready",
+        "status": final_status,
         "metadata": paper_metadata,
         "total_questions": len(solved_solutions),
         "total_marks": paper.total_marks,
@@ -136,8 +216,13 @@ def run_pipeline(
         "solutions": solved_solutions,
     }
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(solved_payload, f, indent=2, ensure_ascii=False)
+    # Optional JSON export
+    if export_json:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / f"{paper.paper_id}.json"
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(solved_payload, f, indent=2, ensure_ascii=False)
+        print(f"\n  • Solution Book JSON : {output_file.resolve()}")
 
     total_elapsed = time.time() - total_start_time
 
@@ -146,11 +231,11 @@ def run_pipeline(
     print("=" * 80)
     print(f"  • Total Solved     : {len(solved_solutions)} / {len(questions_to_solve)} questions")
     print(f"  • Execution Time   : {total_elapsed:.2f} seconds")
-    print(f"  • Status           : ready")
-    print(f"  • Solution Book    : {output_file.resolve()}")
+    print(f"  • Final Status     : {final_status}")
+    print(f"  • Storage Engine   : PostgreSQL (tables: 'papers', 'solved_questions')")
     print("=" * 80)
 
-    return output_file
+    return solved_payload
 
 
 def main():
@@ -190,7 +275,13 @@ def main():
         "--output-dir",
         type=str,
         default="solutionPapers",
-        help="Optional: Directory to save the output JSON (default: solutionPapers)",
+        help="Optional: Directory to save the exported JSON if requested (default: solutionPapers)",
+    )
+    parser.add_argument(
+        "--export-json",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Optional: Also export the solution book to a JSON file (default: False)",
     )
 
     args = parser.parse_args()
@@ -202,6 +293,7 @@ def main():
         class_name=args.class_name,
         board=args.board,
         output_dir=Path(args.output_dir),
+        export_json=args.export_json,
     )
 
 

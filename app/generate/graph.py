@@ -16,7 +16,7 @@ from app.generate.nodes import (
 def route_by_type(state: QuestionState) -> str:
     """Conditional routing function: directs execution based on planner's selected_route."""
     route = state.get("selected_route", "theory")
-    if route in ("math", "mcq", "theory"):
+    if route in ("math", "mcq", "theory", "cached"):
         return route
     return "theory"
 
@@ -35,7 +35,7 @@ def build_question_solver_graph():
     # 2. Wire entry edge
     workflow.add_edge(START, "planner")
 
-    # 3. Wire conditional branching from planner to specialized solvers
+    # 3. Wire conditional branching from planner to specialized solvers (or cache bypass)
     workflow.add_conditional_edges(
         "planner",
         route_by_type,
@@ -43,8 +43,10 @@ def build_question_solver_graph():
             "math": "math_solver",
             "mcq": "mcq_solver",
             "theory": "theory_solver",
+            "cached": "normalizer",
         },
     )
+
 
     # 4. Wire solvers into the normalizer gate
     workflow.add_edge("math_solver", "normalizer")
