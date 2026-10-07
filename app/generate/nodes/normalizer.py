@@ -6,6 +6,10 @@ from app.generate.state import QuestionState, SolutionContract, MarkSplitItem, C
 
 def normalizer_node(state: QuestionState) -> Dict[str, Any]:
     """Sanitizes and normalizes the raw solver output into the exact frozen API contract."""
+    # Fast path: if the question was resolved via cache, preserve the cached solution
+    if state.get("solution"):
+        return {"solution": state["solution"]}
+
     raw = state.get("raw_solution") or {}
     q_num = str(state.get("number") or raw.get("question_number") or "")
     total_marks = int(state.get("marks") or 1)

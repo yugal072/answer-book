@@ -55,7 +55,7 @@ class QuestionState(TypedDict, total=False):
     metadata: Dict[str, Any]  # e.g., {"subject": "Mathematics", "class": "Class 9", "board": "CBSE"}
 
     # 2. Intermediate Variables (set by internal graph nodes)
-    selected_route: str       # "math" | "mcq" | "theory" (decided by Planner)
+    selected_route: str       # "math" | "mcq" | "theory" | "cached" (decided by Planner)
     raw_solution: Optional[Dict[str, Any]]  # Raw output from the specialized solver
 
     # 3. Final Normalized Output
