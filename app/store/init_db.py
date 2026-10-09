@@ -11,6 +11,7 @@ import sys
 from sqlalchemy import inspect
 from app.store.connection import engine
 from app.store.models import Base
+import app.store.knowledge  # noqa: F401  (registers the verified_solutions table)
 
 
 def init_database() -> bool:

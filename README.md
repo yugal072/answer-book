@@ -5,9 +5,23 @@ Turns a question paper into a worked solution book.
 1. **Ingestion** - a question paper (PDF or a photo/scan) becomes a
    canonical `Paper` of `Question` objects, with sections, marks, options
    and metadata preserved.
-2. **Solving** - each question is answered through the LangGraph solve
-   pipeline.
-3. **Output** - a solution book JSON per paper.
+2. **Solving** - each question runs through a LangGraph pipeline: knowledge-base
+   cache lookup -> type-specific solver (LangChain + Groq) -> independent
+   verification with bounded repair -> confidence assessment -> verified
+   storage in PostgreSQL. Answers that are not verified are labelled
+   *teacher review required*, never presented as verified.
+3. **Output** - a `SolvedPaper` served as JSON, an SSE event stream, or a PDF.
+
+Architecture, verification/cache/confidence rules, thresholds and API:
+**[docs/WORKFLOW.md](docs/WORKFLOW.md)** (graph drawings: [docs/workflow_graph.md](docs/workflow_graph.md)).
+
+```bash
+pip install -r requirements.txt
+export GROQ_API_KEY=...  DATABASE_URL=postgresql://user:pass@host/db   # DATABASE_URL optional (process-local otherwise)
+python -m app.store.init_db                       # creates tables (additive, idempotent)
+uvicorn app.main:app                              # API on :8000, docs at /docs
+python -m app.workflow.cli test_papers/question_paper_455.pdf --limit 3 --format pdf --out book.pdf
+```
 
 ## Ingestion
 
@@ -63,8 +77,9 @@ fails validation returns `422` with the reason.
 ```bash
 pip install -r requirements-dev.txt
 
-pytest tests -m "not live" -q          # offline: real 20-paper corpus, no key
-GROQ_API_KEY=... pytest tests -m live -q   # real vision calls, spend quota
+pytest tests -m "not live and not db" -q     # offline: real PDF corpus, graph, API, SSE, PDF; no key
+TEST_DATABASE_URL=postgresql://u:p@host/ab_test pytest tests/workflow/test_persistence.py -q   # real PostgreSQL
+GROQ_API_KEY=... pytest tests -m live -q     # real Groq calls (vision + workflow), spends quota
 ```
 
 The offline suite runs ingestion over the real papers in `data/papers`
@@ -77,7 +92,9 @@ association, schema validity and that no source wording is lost.
 app/ingestion/   text_parser.py, paper_loader.py, image_loader.py,
                  validation.py, errors.py
 app/models/      canonical Paper / Question
-app/generate/    LangGraph solve pipeline
+app/workflow/    LangGraph architecture: adapter, graphs, verifier, cache policy, LLM gateway, PDF/SSE
+app/store/       SQLAlchemy models (+ verified_solutions knowledge base)
+app/generate/    earlier Groq prototype (kept, no longer used by the API)
 app/api/         FastAPI routes
 data/papers/     the 20-paper test corpus
 docs/ingestion.md
