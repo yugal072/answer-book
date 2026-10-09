@@ -22,3 +22,6 @@ Thumbs.db
 
 # Extracted data folder
 extracted/
+# Local secrets / env files
+.env.*
+*.pem
