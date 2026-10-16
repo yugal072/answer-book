@@ -1,9 +1,11 @@
-"""LangGraph State definitions for the Question Solve Engine.
+"""State schemas for the AnswerBook question-solving workflow.
 
-Defines the exact structure of data passed between nodes in the graph.
+PaperState is the parent orchestration state.
+QuestionState is the state for solving one individual question.
 """
 
-from typing import List, Optional, Dict, Any
+import operator
+from typing import List, Optional, Dict, Any, Literal, Annotated
 from typing_extensions import TypedDict
 
 
@@ -25,7 +27,9 @@ MarkSplitItem = TypedDict(
 
 
 class SolutionContract(TypedDict):
-    """The frozen output contract as specified in Section 3 of the brief."""
+    """Normalized final output contract for one solved question. 
+    Mentioned in section 3 of brief."""
+    
     question_number: str
     answer: str
     steps: List[str]
@@ -38,38 +42,98 @@ class SolutionContract(TypedDict):
 
 # --- Main LangGraph States ---
 
-class QuestionState(TypedDict, total=False):
-    """State schema for processing an individual question in LangGraph."""
+QuestionType = Literal["numerical", "mcq", "short", "long"]
 
+class QuestionInput(TypedDict):
+    """Question data produced by ingestion and normalized by the adapter."""
     # 1. Inputs (from Ingestion / static JSON)
     number: str
-    section: str
+    section: Optional[str]
     text: str
-    marks: int
-    type: str
+    marks: Optional[int]
+    type: QuestionType
     options: Optional[List[str]]
     has_figure: bool
-    page: int
+    page: Optional[int]
     choice_group: Optional[str]
+    section_title: Optional[str]
     chapter: Optional[str]
-    metadata: Dict[str, Any]  # e.g., {"subject": "Mathematics", "class": "Class 9", "board": "CBSE"}
+   
+ 
+class VerificationState(TypedDict, total=False):
+    """Results from solution verification."""
+    status: Literal["not_checked", "passed", "failed", "needs_review"]
+    verified_by: Optional[str]
+    reasons: list[str]
+    checks: dict[str, Any]
 
-    # 2. Intermediate Variables (set by internal graph nodes)
-    selected_route: str       # "math" | "mcq" | "theory" | "cached" (decided by Planner)
-    raw_solution: Optional[Dict[str, Any]]  # Raw output from the specialized solver
 
-    # 3. Final Normalized Output
-    solution: Optional[SolutionContract]    # Sanitized final object matching API contract
+class QuestionWorkItem(QuestionInput, total=False):
+    """Question input plus identity and initial execution state.
+
+    This is the item stored in PaperState and dispatched to a worker.
+    """
+    
+    work_item_id: str
+    question_index: int
+
+    selected_route: Optional[str]
+    attempts: int
+    max_attempts: int
+
+    raw_solution: Optional[dict[str, Any]]
+    verification: Optional[VerificationState]
+    confidence: Optional[float]
+
+    cache_status: Literal["not_checked", "hit", "miss", "error"]
+    solution: Optional[SolutionContract]
+    error: Optional[str]
 
 
+class QuestionState(QuestionWorkItem):
+    """State received and updated by a single question-solving execution.
+
+    A worker receives one question, never the complete paper's question list.
+    """
+    
+# Paper Level Orchestration State
+
+class PaperMetadata(TypedDict):
+    subject: Optional[str]
+    class_name: Optional[str]
+    board: Optional[str]
+    total_marks: Optional[int]
+    sections: list[str]
+    declared_total_questions: Optional[int]
+    
+class QuestionResult(TypedDict):
+    """A completed question result associated with its original position."""
+
+    work_item_id: str
+    question_index: int
+    question_number: str
+    solution: Optional[SolutionContract]
+    status: Literal["completed", "failed", "needs_review"]
+    error: Optional[str]
+    
 class PaperState(TypedDict, total=False):
-    """State schema for orchestrating an entire paper with multiple questions."""
+    """Parent state for orchestrating all questions in a paper."""
 
     paper_id: str
     fingerprint: str
     status: str
-    paper_metadata: Dict[str, Any]
-    questions: List[Dict[str, Any]]
+    paper_metadata: PaperMetadata
+
+    # All question work items, preserving ingestion order.
+    questions: list[QuestionWorkItem]
     total_questions: int
+
+    # Parent-level progress and collected worker outputs.
     current_index: int
-    solutions: List[SolutionContract]
+    results: list[QuestionResult]
+
+    # Paper-level failure information.
+    errors: list[str]
+    
+    # Parallel workers append their individual results through this reducer
+    worker_results: Annotated[list[QuestionResult], operator.add]

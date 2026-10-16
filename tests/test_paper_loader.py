@@ -17,9 +17,6 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-
 from app.ingestion.errors import DocumentError  # noqa: E402
 from app.ingestion.paper_loader import (  # noqa: E402
     extract_header_facts,
