@@ -21,41 +21,49 @@ The system is divided into four main layers.
 
 ```mermaid
 flowchart TD
-    A["User uploads exam paper"] --> B["FastAPI Backend"]
-    B --> C["Ingestion Pipeline"]
-    C --> D["Structured Paper and Questions"]
-    D --> E["LangGraph: Paper Workflow"]
+    A[FastAPI] --> B[Ingestion: OCR + Layout]
+    B --> C[Paper]
+    C --> D[Graph Adapter: Validation, Normalization, WorkItem Creation]
+    D --> E[GraphState]
+    E --> F[Validate / Prepare]
+    F --> G[Fan-out Questions]
 
-    E --> F["Prepare and Validate Paper"]
-    F --> G["Dispatch Questions in Parallel"]
+    G --> Q1[Question 1]
+    G --> Q2[Question 2]
+    G --> QN[Question N]
 
-    G --> H["Per-Question Workflow"]
+    Q1 --> K[Knowledge Cache Lookup]
+    Q2 --> K
+    QN --> K
 
-    H --> I["Check Knowledge Cache"]
-    I --> J{"Eligible cached answer?"}
+    DB[(PostgreSQL<br/>Question–Solution Knowledge Base)]
+    DB --- K
 
-    J -- Yes --> K["Validate Cache Candidate"]
-    J -- No --> L["Plan the Solution"]
+    K --> M{Acceptable Match?}
+    M -->|Yes| R[Retrieve Stored Solution]
+    M -->|No| S[Solver Node<br/>Type-specific Strategy + Prompt]
 
-    K --> M["Quality Control"]
-    L --> N["Select Model, Prompt and Tools"]
-    N --> O["Generate Candidate Answer"]
-    O --> M
+    S --> T[Draft Solution]
+    T --> V[Verifier Node<br/>Type-specific Verification]
+    V --> W{Verification Passes?}
 
-    M --> P{"Meets Acceptance Rules?"}
-    P -- Yes --> Q["Finalize Solution"]
-    P -- No --> R{"Repair attempts remaining?"}
+    W -->|No: Retries Remain| X[Repair / Retry]
+    X --> S
+    W -->|Pass or Retry Limit Reached| AC[Assess Confidence]
 
-    R -- Yes --> S["Repair Candidate Answer"]
-    S --> M
-    R -- No --> T["Flag for Teacher Review"]
+    AC --> TH{Confidence and Accuracy<br/>Thresholds Met?}
+    TH -->|Yes| ST[Store Verified Q+A in PostgreSQL]
+    TH -->|No| FQ[Finalize Question<br/>Review Required]
 
-    Q --> U["Store Eligible Answer"]
-    U --> V["Aggregate Question Results"]
-    T --> V
+    R --> FQ
+    ST --> FQ
+    FQ --> AG[Aggregate Results]
+    AG --> SP[Build SolvedPaper]
+    SP --> AS[Assembly / Serving]
 
-    V --> W["Assemble Solution Book"]
-    W --> X["Return Results to User"]
+    AS --> J[JSON]
+    AS --> SSE[SSE]
+    AS --> PDF[PDF]
 ```
 
 ## 3. Layer One: Paper Processing
