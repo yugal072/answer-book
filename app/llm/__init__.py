@@ -1,4 +1,29 @@
-# app.llm package
-from app.llm.client import get_llm_client, call_groq_json
+"""LLM client interfaces and capabilities."""
 
-__all__ = ["get_llm_client", "call_groq_json"]
+from __future__ import annotations
+
+from app.llm.capabilities import (
+    CapabilityUnavailable,
+    ImageGenerationProvider,
+    OpenAIImageGenerationProvider,
+    OpenAIVisionProvider,
+    VisionProvider,
+)
+from app.llm.client import (
+    LLMCallError,
+    call_groq_json,
+    clean_json_text,
+    get_llm_client,
+)
+
+__all__ = [
+    "CapabilityUnavailable",
+    "ImageGenerationProvider",
+    "OpenAIImageGenerationProvider",
+    "OpenAIVisionProvider",
+    "VisionProvider",
+    "LLMCallError",
+    "call_groq_json",
+    "clean_json_text",
+    "get_llm_client",
+]
