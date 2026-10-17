@@ -1,4 +1,3 @@
-
 """Aggregate parallel question-worker results into the parent paper state."""
 
 from __future__ import annotations
@@ -89,7 +88,9 @@ def aggregate_results(state: PaperState) -> dict[str, Any]:
     )
 
     # "ready" means processing finished, not that every answer is verified.
-    if questions and failed_count == len(questions):
+    if state.get("status") == "failed" or (
+        questions and failed_count == len(questions)
+    ):
         paper_status = "failed"
     else:
         paper_status = "ready"
