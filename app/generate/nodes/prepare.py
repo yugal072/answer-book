@@ -1,13 +1,13 @@
+"""Validate PaperState, PaperMetadata, and QuestionWorkItems before fan-out.
 
-"""Validate the PaperState, PaperMetadata, QuestionWorkItem from the adapter.py 
-Prepare a PaperState for question-level LangGraph execution."""
+Prepare a PaperState for question-level LangGraph execution.
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
 from app.generate.state import PaperState, QuestionWorkItem
-
 
 REQUIRED_QUESTION_FIELDS = ("work_item_id", "question_index", "number", "text")
 
@@ -47,7 +47,8 @@ def prepare_paper(state: PaperState) -> dict[str, Any]:
             continue
 
         missing = [
-            field for field in REQUIRED_QUESTION_FIELDS
+            field
+            for field in REQUIRED_QUESTION_FIELDS
             if field not in item or item[field] is None
         ]
         if missing:
@@ -59,7 +60,9 @@ def prepare_paper(state: PaperState) -> dict[str, Any]:
 
         work_item_id = item["work_item_id"]
         if not isinstance(work_item_id, str) or not work_item_id.strip():
-            errors.append(f"Question at index {index} has an invalid work_item_id.")
+            errors.append(
+                f"Question at index {index} has an invalid work_item_id."
+            )
             continue
 
         if work_item_id in seen_ids:
