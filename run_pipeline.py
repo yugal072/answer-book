@@ -1,301 +1,185 @@
-"""Main Pipeline Orchestrator: Connects Ingestion (Role 1) to LangGraph Solving (Role 2)
-with PostgreSQL persistence, Recommendation A paper caching, and atomic checkpointing.
+"""Live & Simulated execution script for the AnswerBook solver pipeline.
 
 Usage:
-    python main.py <path_to_paper> [--limit N] [--subject SUBJECT] [--class-name CLASS] [--export-json]
+    # Run in simulation / mock mode (no API key required):
+    python scripts/run_pipeline.py --mock
 
-Examples:
-    python main.py test_papers/question_paper_455.pdf --limit 3
-    python main.py test_papers/question_paper_455.pdf --export-json
-    python main.py test_papers/question_paper_463.pdf
+    # Run live against configured Groq API (requires GROQ_API_KEY in .env):
+    python scripts/run_pipeline.py
 """
+
+from __future__ import annotations
 
 import argparse
 import json
 import sys
-import time
-from pathlib import Path
-from typing import Any, Dict, Optional
+from unittest.mock import patch
 
-# Ensure UTF-8 output on Windows terminal
-if sys.platform == "win32":
-    sys.stdout.reconfigure(encoding="utf-8")
-
-from app.ingestion.paper_loader import ingest_paper
-from app.generate.graph import solve_question
-from app.tools import (
-    check_paper_cache,
-    generate_paper_fingerprint,
-    generate_question_signature,
-    get_paper_resume_info,
-    mark_paper_status,
-    save_question_checkpoint,
-    upsert_paper_record,
-)
+from app.core.config import settings
+from app.generate.adapter import paper_to_graph_state
+from app.generate.graph import build_graph
+from app.generate.prompts import PLANNER_SYSTEM, SOLUTION_SYSTEM, VERIFY_SYSTEM
+from app.models.loaders_models import Paper, Question
 
 
-def run_pipeline(
-    file_path: Path,
-    limit: Optional[int] = None,
-    subject: Optional[str] = None,
-    class_name: Optional[str] = None,
-    board: str = "CBSE",
-    output_dir: Path = Path("solutionPapers"),
-    export_json: bool = False,
-) -> Dict[str, Any]:
-    """Runs the end-to-end pipeline from raw paper file to verified Solution Book."""
+def mock_groq_handler(
+    system_prompt: str,
+    user_prompt: str,
+    max_retries: int | None = None,
+    model: str | None = None,
+    temperature: float | None = None,
+) -> dict:
+    if system_prompt == PLANNER_SYSTEM:
+        return {
+            "task_summary": "Solve arithmetic calculation",
+            "complexity": "easy",
+            "model_tier": "cheap",
+            "needs_vision": False,
+            "needs_image_generation": False,
+            "needs_external_tools": ["calculator"],
+            "tool_requests": [
+                {
+                    "name": "calculator",
+                    "expression": "15 * 8 + 10",
+                    "purpose": "evaluate arithmetic expression",
+                }
+            ],
+            "verification_focus": ["arithmetic", "steps"],
+            "rationale": "Direct arithmetic computation.",
+        }
 
-    if not file_path.exists():
-        print(f"[ERROR] File not found: {file_path}")
+    if system_prompt == SOLUTION_SYSTEM:
+        return {
+            "answer": "130",
+            "steps": [
+                "Step 1: Compute 15 * 8 = 120.",
+                "Step 2: Add 10: 120 + 10 = 130.",
+            ],
+            "mark_split": [
+                {"marks": 1, "for": "Multiplication step"},
+                {"marks": 1, "for": "Final addition and answer"},
+            ],
+            "common_mistakes": [
+                {"wrong": "120", "why": "Forgot to add 10 in the final step"}
+            ],
+        }
+
+    if system_prompt == VERIFY_SYSTEM:
+        return {
+            "passed": True,
+            "correctness": 1.0,
+            "issues": [],
+            "checks": {
+                "structure_valid": True,
+                "answer_review_passed": True,
+                "independent_check_passed": True,
+            },
+            "suggested_repairs": [],
+        }
+
+    raise ValueError("Unrecognized prompt in mock")
+
+
+def run(mock: bool = False) -> None:
+    print("=" * 70)
+    mode = "SIMULATED (MOCK LLM)" if mock else "LIVE (GROQ API)"
+    print(f"      ANSWERBOOK SOLVER PIPELINE EXECUTION [{mode}]")
+    print("=" * 70)
+
+    if not mock and not settings.GROQ_API_KEY:
+        print(
+            "\n[!] GROQ_API_KEY is not set in environment or .env file.\n"
+            "    To test without an API key, run with the --mock flag:\n"
+            "    python scripts/run_pipeline.py --mock\n"
+        )
         sys.exit(1)
 
-    print("=" * 80)
-    print("      ANSWER BOOK — END-TO-END PIPELINE (WITH DB PERSISTENCE & CACHE)")
-    print("=" * 80)
+    print("\n[1/4] Constructing sample exam paper with Question models...")
+    sample_paper = Paper(
+        paper_id="demo_paper_2026",
+        fingerprint="demo_fp_789xyz",
+        status="parsing",
+        subject="Mathematics",
+        class_name="Class 10",
+        board="CBSE",
+        total_questions=2,
+        total_marks=5,
+        sections=["Section A", "Section B"],
+        questions=[
+            Question(
+                number="1",
+                section="Section A",
+                text="Evaluate 15 * 8 + 10.",
+                marks=2,
+                type="numerical",
+                has_figure=False,
+            ),
+            Question(
+                number="2",
+                section="Section B",
+                text="Define the Pythagorean theorem and state its formula.",
+                marks=3,
+                type="short",
+                has_figure=False,
+            ),
+        ],
+    )
+    print(
+        f"      Paper ID: {sample_paper.paper_id} ({len(sample_paper.questions)} questions)"
+    )
 
-    total_start_time = time.time()
+    print("\n[2/4] Converting Paper into LangGraph PaperState...")
+    state = paper_to_graph_state(sample_paper)
+    print(f"      Initial state total questions: {state['total_questions']}")
+    print(f"      Work item IDs: {[q['work_item_id'] for q in state['questions']]}")
 
-    # --------------------------------------------------------------------------
-    # Step 0: Pre-Flight Paper Cache Check (Recommendation A)
-    # --------------------------------------------------------------------------
-    raw_fingerprint = generate_paper_fingerprint(file_path)
-    print(f"\n[CACHE PRE-FLIGHT] Checking PostgreSQL database for fingerprint: {raw_fingerprint[:12]}...")
+    print("\n[3/4] Compiling LangGraph workflow...")
+    graph = build_graph()
+    print("      Workflow compiled successfully: prepare -> solve_question (Send) -> aggregate_results")
 
-    # If no limit is requested, check if the full paper is already solved in the DB
-    if not limit:
-        cached_paper = check_paper_cache(raw_fingerprint)
-        if cached_paper:
-            total_elapsed = time.time() - total_start_time
-            print("=" * 80)
-            print("  [CACHE HIT] Paper already fully solved in PostgreSQL! (0 LLM API calls)")
-            print("=" * 80)
-            print(f"  • Paper ID        : {cached_paper['paper_id']}")
-            print(f"  • Fingerprint     : {cached_paper['fingerprint']}")
-            print(f"  • Total Solved    : {len(cached_paper['solutions'])} questions")
-            print(f"  • Status          : {cached_paper['status']}")
-            print(f"  • Response Time   : {total_elapsed:.4f} seconds")
-
-            if export_json:
-                output_dir.mkdir(parents=True, exist_ok=True)
-                out_file = output_dir / f"{cached_paper['paper_id']}.json"
-                with open(out_file, "w", encoding="utf-8") as f:
-                    json.dump(cached_paper, f, indent=2, ensure_ascii=False)
-                print(f"  • Exported JSON   : {out_file.resolve()}")
-
-            print("=" * 80)
-            return cached_paper
-
-    print("  • Cache status    : Miss / Processing required")
-
-    # --------------------------------------------------------------------------
-    # Step 1: Ingestion (Role 1)
-    # --------------------------------------------------------------------------
-    print(f"\n[PHASE 1: INGESTION] Processing: {file_path.name}")
-    suffix = file_path.suffix.lower()
-
-    if suffix == ".pdf":
-        paper = ingest_paper(file_path)
-    elif suffix in {".png", ".jpg", ".jpeg", ".webp"}:
-        from app.ingestion.image_loader import extract_paper_from_image_file
-        paper = extract_paper_from_image_file(file_path)
+    print("\n[4/4] Invoking pipeline...")
+    if mock:
+        with patch(
+            "app.generate.nodes.solve_question.call_groq_json",
+            side_effect=mock_groq_handler,
+        ):
+            final_output = graph.invoke(state)
     else:
-        print(f"[ERROR] Unsupported file format '{suffix}'. Supported: .pdf, .png, .jpg, .webp")
-        sys.exit(1)
+        final_output = graph.invoke(state)
 
-    # Resolve metadata
-    resolved_subject = subject or paper.subject or "General"
-    resolved_class = class_name or paper.class_name or "Class 9"
-    resolved_board = board or paper.board or "CBSE"
+    print("\n" + "=" * 70)
+    print(f"  EXECUTION COMPLETED: Paper Status = '{final_output.get('status')}'")
+    print("=" * 70)
 
-    print(f"  • Paper ID        : {paper.paper_id}")
-    print(f"  • Fingerprint     : {paper.fingerprint}")
-    print(f"  • Total Questions : {paper.total_questions}")
-    print(f"  • Total Marks     : {paper.total_marks}")
-    print(f"  • Sections Found  : {', '.join(paper.sections) if paper.sections else 'None'}")
-    print(f"  • Subject / Grade : {resolved_subject} ({resolved_class}, {resolved_board})")
-    print("-" * 80)
+    for i, res in enumerate(final_output.get("results", [])):
+        sol = res.get("solution") or {}
+        print(f"\n--- Question #{res.get('question_number')} (Status: {res.get('status')}) ---")
+        print(f"Answer:     {sol.get('answer')}")
+        print(f"Confidence: {sol.get('confidence')} (Teacher Review: {sol.get('needs_teacher_check')})")
+        print(f"Verified:   {sol.get('verified_by')}")
+        if sol.get("steps"):
+            print("Steps:")
+            for s in sol["steps"]:
+                print(f"  • {s}")
+        if res.get("error"):
+            print(f"Error:      {res.get('error')}")
 
-    # Upsert paper entry in PostgreSQL with status 'solving'
-    upsert_paper_record(
-        paper_id=paper.paper_id,
-        fingerprint=paper.fingerprint,
-        status="solving",
-        subject=resolved_subject,
-        class_name=resolved_class,
-        board=resolved_board,
-        total_questions=paper.total_questions,
-        total_marks=paper.total_marks,
-        sections=paper.sections,
-        source_file=str(file_path),
-    )
-
-    # --------------------------------------------------------------------------
-    # Step 2: Crash Recovery & Solving (Role 2 — LangGraph)
-    # --------------------------------------------------------------------------
-    questions_to_solve = paper.questions
-    if limit and limit > 0:
-        questions_to_solve = questions_to_solve[:limit]
-        print(f"\n[PHASE 2: SOLVING] Solving first {limit} of {len(paper.questions)} questions...")
-    else:
-        print(f"\n[PHASE 2: SOLVING] Solving all {len(questions_to_solve)} questions...")
-
-    # Check for previously saved checkpoints in PostgreSQL
-    existing_solutions, solved_numbers = get_paper_resume_info(paper.paper_id)
-    solved_map = {sol["question_number"]: sol for sol in existing_solutions}
-
-    if solved_numbers:
-        print(f"\n[RESUME MODE] Found {len(solved_numbers)} previously saved questions in database!")
-        print(f"             Pre-loaded: {sorted(list(solved_numbers))}")
-
-    paper_metadata = {
-        "paper_id": paper.paper_id,
-        "fingerprint": paper.fingerprint,
-        "subject": resolved_subject,
-        "class": resolved_class,
-        "board": resolved_board,
-        "source_file": str(file_path),
+    print("\nFull Output Summary JSON:")
+    summary = {
+        "status": final_output.get("status"),
+        "total_questions": final_output.get("total_questions"),
+        "errors": final_output.get("errors"),
+        "results_count": len(final_output.get("results", [])),
     }
-
-    solved_solutions = []
-
-    for idx, q in enumerate(questions_to_solve, start=1):
-        q_num = str(q.number)
-        q_type = q.type
-        marks = q.marks or 1
-        prompt_snippet = q.text[:95] + "..." if len(q.text) > 95 else q.text
-
-        # 1. Skip if already solved in a previous run (Crash Recovery)
-        if q_num in solved_map:
-            print(f"\n>>> [{idx}/{len(questions_to_solve)}] Q{q_num} [ALREADY SOLVED IN DB - SKIPPED]")
-            solved_solutions.append(solved_map[q_num])
-            continue
-
-        print(f"\n>>> [{idx}/{len(questions_to_solve)}] Q{q_num} [{q_type.upper()}, {marks} Mark(s)]:")
-        print(f"    Text: {prompt_snippet}")
-
-        q_start = time.time()
-        try:
-            # Call LangGraph Question Solve Engine (checks question signature cache internally)
-            solution = solve_question(q.model_dump(), paper_metadata)
-            elapsed = time.time() - q_start
-
-            # 2. Atomic Question Checkpoint: commit immediately to PostgreSQL
-            sig = generate_question_signature(q.text, marks, resolved_board, resolved_class)
-            save_question_checkpoint(paper.paper_id, sig, q.model_dump(), solution)
-
-            solved_solutions.append(solution)
-
-            print(f"    [Time: {elapsed:.2f}s | Confidence: {solution['confidence']:.2f} | Teacher Check: {solution['needs_teacher_check']}]")
-            print(f"    ANSWER: {solution['answer']}")
-            print(f"    STEPS ({len(solution.get('steps', []))} steps):")
-            for s in solution.get("steps", [])[:3]:
-                print(f"      • {s}")
-            if len(solution.get("steps", [])) > 3:
-                print(f"      • ... ({len(solution.get('steps', [])) - 3} more steps)")
-
-        except Exception as e:
-            print(f"    [ERROR solving Q{q_num}]: {e}")
-
-    # --------------------------------------------------------------------------
-    # Step 3: Assembly & Status Finalization
-    # --------------------------------------------------------------------------
-    is_fully_solved = len(solved_solutions) == len(paper.questions)
-    final_status = "ready" if is_fully_solved else "partial"
-
-    if is_fully_solved:
-        mark_paper_status(paper.paper_id, "ready")
-
-    solved_payload = {
-        "paper_id": paper.paper_id,
-        "fingerprint": paper.fingerprint,
-        "status": final_status,
-        "metadata": paper_metadata,
-        "total_questions": len(solved_solutions),
-        "total_marks": paper.total_marks,
-        "sections": paper.sections,
-        "solutions": solved_solutions,
-    }
-
-    # Optional JSON export
-    if export_json:
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_file = output_dir / f"{paper.paper_id}.json"
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(solved_payload, f, indent=2, ensure_ascii=False)
-        print(f"\n  • Solution Book JSON : {output_file.resolve()}")
-
-    total_elapsed = time.time() - total_start_time
-
-    print("\n" + "=" * 80)
-    print("                      PIPELINE EXECUTION COMPLETE")
-    print("=" * 80)
-    print(f"  • Total Solved     : {len(solved_solutions)} / {len(questions_to_solve)} questions")
-    print(f"  • Execution Time   : {total_elapsed:.2f} seconds")
-    print(f"  • Final Status     : {final_status}")
-    print(f"  • Storage Engine   : PostgreSQL (tables: 'papers', 'solved_questions')")
-    print("=" * 80)
-
-    return solved_payload
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Answer Book End-to-End Pipeline: Ingest paper and generate verified Solution Book."
-    )
-    parser.add_argument(
-        "file_path",
-        type=str,
-        help="Path to the PDF or image exam paper (e.g. test_papers/question_paper_455.pdf)",
-    )
-    parser.add_argument(
-        "--limit",
-        type=int,
-        default=None,
-        help="Optional: Limit the number of questions to solve (useful for quick tests)",
-    )
-    parser.add_argument(
-        "--subject",
-        type=str,
-        default=None,
-        help="Optional: Subject name (e.g. 'Mathematics', 'Science')",
-    )
-    parser.add_argument(
-        "--class-name",
-        type=str,
-        default=None,
-        help="Optional: Grade/Class (e.g. 'Class 9', 'Class 10')",
-    )
-    parser.add_argument(
-        "--board",
-        type=str,
-        default="CBSE",
-        help="Optional: Board name (default: CBSE)",
-    )
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default="solutionPapers",
-        help="Optional: Directory to save the exported JSON if requested (default: solutionPapers)",
-    )
-    parser.add_argument(
-        "--export-json",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-        help="Optional: Also export the solution book to a JSON file (default: False)",
-    )
-
-    args = parser.parse_args()
-
-    run_pipeline(
-        file_path=Path(args.file_path),
-        limit=args.limit,
-        subject=args.subject,
-        class_name=args.class_name,
-        board=args.board,
-        output_dir=Path(args.output_dir),
-        export_json=args.export_json,
-    )
+    print(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Test AnswerBook pipeline")
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Run with mocked LLM responses instead of calling Groq API",
+    )
+    args = parser.parse_args()
+    run(mock=args.mock)
