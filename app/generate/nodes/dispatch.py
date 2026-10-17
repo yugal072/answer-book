@@ -1,5 +1,4 @@
-
-"""Dispatch individual questions to parallel solving workers."""
+"""Dispatch isolated question workers, carrying only necessary paper context."""
 
 from __future__ import annotations
 
@@ -9,28 +8,22 @@ from app.generate.state import PaperState
 
 
 def dispatch_questions(state: PaperState) -> list[Send] | str:
-    """Fan out one Send task per question.
-
-    Intended for use as a conditional edge after prepare_paper().
-    Returns the aggregate node name when there is nothing to dispatch.
-    """
+    """Evaluate paper status and dispatch parallel Send tasks for each question."""
     if state.get("status") == "failed":
         return "aggregate_results"
 
     questions = state.get("questions", [])
-
     if not questions:
         return "aggregate_results"
 
-    sends: list[Send] = []
+    metadata = state.get("paper_metadata", {})
+    paper_id = state.get("paper_id", "")
 
+    sends: list[Send] = []
     for question in questions:
-        # Send payload becomes the isolated state of one worker.
-        sends.append(
-            Send(
-                "solve_question",
-                dict(question),
-            )
-        )
+        payload = dict(question)
+        payload["paper_id"] = paper_id
+        payload["paper_metadata"] = dict(metadata)
+        sends.append(Send("solve_question", payload))
 
     return sends
