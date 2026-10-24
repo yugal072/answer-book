@@ -5,3 +5,4 @@ pillow
 openai 
 pydantic
 groq
+langchain-google-genai
