@@ -12,8 +12,6 @@ Every assertion here checks a concrete value; none of them asserts only
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from app.ingestion.text_parser import (  # noqa: E402
     parse_pages,
     strip_running_heads,

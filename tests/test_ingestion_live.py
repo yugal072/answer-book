@@ -18,9 +18,6 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-
 pymupdf = pytest.importorskip("pymupdf", reason="pymupdf needed to render pages")
 
 from app.ingestion.image_loader import (  # noqa: E402
