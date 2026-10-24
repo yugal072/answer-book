@@ -20,9 +20,8 @@ from app.models.loaders_models import Paper, Question
 def mock_call_groq_json(
     system_prompt: str,
     user_prompt: str,
-    max_retries: int | None = None,
-    model: str | None = None,
-    temperature: float | None = None,
+    *args,
+    **kwargs,
 ) -> dict[str, Any]:
     """Deterministic mock for LLM calls during pipeline testing."""
     if system_prompt == PLANNER_SYSTEM:
@@ -121,7 +120,7 @@ def test_full_pipeline_execution():
     graph = build_graph()
 
     with patch(
-        "app.generate.nodes.solve_question.call_groq_json",
+        "app.generate.nodes.solve_question.call_json",
         side_effect=mock_call_groq_json,
     ):
         final_state = graph.invoke(initial_state)
