@@ -5,25 +5,30 @@ from __future__ import annotations
 from app.llm.capabilities import (
     CapabilityUnavailable,
     ImageGenerationProvider,
-    OpenAIImageGenerationProvider,
-    OpenAIVisionProvider,
     VisionProvider,
+    ConfiguredVisionProvider,
+    ConfiguredImageGenerationProvider
 )
 from app.llm.client import (
+    CapabilityUnavailable,
     LLMCallError,
     call_groq_json,
     clean_json_text,
-    get_llm_client,
+    build_chat_model,
+    call_json,
+    interpret_image
 )
 
 __all__ = [
     "CapabilityUnavailable",
     "ImageGenerationProvider",
-    "OpenAIImageGenerationProvider",
-    "OpenAIVisionProvider",
+    "ConfiguredVisionProvider",
+    "ConfiguredImageGenerationProvider",
     "VisionProvider",
     "LLMCallError",
     "call_groq_json",
     "clean_json_text",
-    "get_llm_client",
+    "build_chat_model",
+    "call_json",
+    "interpret_image",
 ]
