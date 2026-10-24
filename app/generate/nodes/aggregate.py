@@ -88,13 +88,15 @@ def aggregate_results(state: PaperState) -> dict[str, Any]:
     )
 
     # "ready" means processing finished, not that every answer is verified.
-    if state.get("status") == "failed" or (
-        questions and failed_count == len(questions)
-    ):
+    if not questions:
         paper_status = "failed"
+    elif failed_count == len(questions):
+        paper_status = "failed"
+    elif failed_count > 0 or errors:
+        paper_status = "partial"
     else:
         paper_status = "ready"
-
+            
     return {
         "results": ordered_results,
         "errors": errors,
