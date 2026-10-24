@@ -6,3 +6,6 @@ openai
 pydantic
 groq
 langchain-google-genai
+langgraph
+sqlalchemy
+python-dotenv
