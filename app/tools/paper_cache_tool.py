@@ -6,24 +6,21 @@ Implements Recommendation A:
 - Paper lifecycle status updates ('parsing' -> 'solving' -> 'ready' / 'failed').
 """
 
-from __future__ import annotations
-
-from typing import Any
+from typing import Any, Dict, List, Optional, Set, Tuple
 from sqlalchemy import func
-
-from app.core.config import settings
 from app.store.connection import get_db_session
 from app.store.models import PaperTable, SolvedQuestionTable
+from app.core.config import settings
 
 
-def check_paper_cache(fingerprint: str) -> dict[str, Any] | None:
-    """Check if a paper has already been completely solved.
+def check_paper_cache(fingerprint: str) -> Optional[Dict[str, Any]]:
+    """Checks if a paper has already been completely solved.
 
     Args:
         fingerprint: SHA-256 hash of the input paper file.
 
     Returns:
-        Complete Solution Book payload if status == 'ready', else None.
+        dict: Complete Solution Book payload if status == 'ready', else None.
     """
     if not fingerprint:
         return None
@@ -45,40 +42,27 @@ def check_paper_cache(fingerprint: str) -> dict[str, Any] | None:
             .order_by(SolvedQuestionTable.id.asc())
             .all()
         )
-
         # A paper can be marked processing-ready while some answers still need review.
         # Only use the paper cache if every expected answer has a verified audit trail.
-        if not q_rows or len(q_rows) != int(paper.total_questions or 0):
+        if (not q_rows or len(q_rows) != int(paper.total_questions or 0)
+                or any(q.needs_teacher_check or q.verification_status != "passed"
+                       or not q.model_used or not q.prompt_version
+                       or q.confidence is None or q.confidence < settings.SOLUTION_CACHE_MIN_CONFIDENCE
+                       for q in q_rows)):
             return None
 
-        is_invalid = any(
-            q.needs_teacher_check
-            or q.verification_status != "passed"
-            or not q.model_used
-            or not q.prompt_version
-            or q.confidence is None
-            or q.confidence < settings.SOLUTION_CACHE_MIN_CONFIDENCE
-            for q in q_rows
-        )
-        if is_invalid:
-            return None
-
-        solutions: list[dict[str, Any]] = []
+        solutions: List[Dict[str, Any]] = []
         for q in q_rows:
-            solutions.append(
-                {
-                    "question_number": q.question_number,
-                    "answer": q.answer,
-                    "steps": q.steps or [],
-                    "mark_split": q.mark_split or [],
-                    "common_mistakes": q.common_mistakes or [],
-                    "confidence": (
-                        q.confidence if q.confidence is not None else 0.0
-                    ),
-                    "verified_by": f"cache:paper_fingerprint:{q.verified_by or 'db'}",
-                    "needs_teacher_check": q.needs_teacher_check,
-                }
-            )
+            solutions.append({
+                "question_number": q.question_number,
+                "answer": q.answer,
+                "steps": q.steps or [],
+                "mark_split": q.mark_split or [],
+                "common_mistakes": q.common_mistakes or [],
+                "confidence": q.confidence if q.confidence is not None else 0.0,
+                "verified_by": f"cache:paper_fingerprint:{q.verified_by or 'db'}",
+                "needs_teacher_check": q.needs_teacher_check,
+            })
 
         return {
             "paper_id": paper.paper_id,
@@ -96,14 +80,14 @@ def check_paper_cache(fingerprint: str) -> dict[str, Any] | None:
         }
 
 
-def get_paper_resume_info(paper_id: str) -> tuple[list[dict[str, Any]], set[str]]:
-    """Fetch already-solved questions for crash recovery.
+def get_paper_resume_info(paper_id: str) -> Tuple[List[Dict[str, Any]], Set[str]]:
+    """Fetches already-solved questions for crash recovery.
 
     Args:
         paper_id: The ID of the paper being processed.
 
     Returns:
-        (list of already solved SolutionContract dicts, set of solved question numbers)
+        tuple: (list of already solved SolutionContract dicts, set of solved question numbers)
     """
     if not paper_id:
         return [], set()
@@ -116,25 +100,21 @@ def get_paper_resume_info(paper_id: str) -> tuple[list[dict[str, Any]], set[str]
             .all()
         )
 
-        existing_solutions: list[dict[str, Any]] = []
-        solved_numbers: set[str] = set()
+        existing_solutions: List[Dict[str, Any]] = []
+        solved_numbers: Set[str] = set()
 
         for q in q_rows:
             solved_numbers.add(q.question_number)
-            existing_solutions.append(
-                {
-                    "question_number": q.question_number,
-                    "answer": q.answer,
-                    "steps": q.steps or [],
-                    "mark_split": q.mark_split or [],
-                    "common_mistakes": q.common_mistakes or [],
-                    "confidence": (
-                        q.confidence if q.confidence is not None else 0.0
-                    ),
-                    "verified_by": f"checkpoint:{q.verified_by or 'db'}",
-                    "needs_teacher_check": q.needs_teacher_check,
-                }
-            )
+            existing_solutions.append({
+                "question_number": q.question_number,
+                "answer": q.answer,
+                "steps": q.steps or [],
+                "mark_split": q.mark_split or [],
+                "common_mistakes": q.common_mistakes or [],
+                "confidence": q.confidence if q.confidence is not None else 0.0,
+                "verified_by": f"checkpoint:{q.verified_by or 'db'}",
+                "needs_teacher_check": q.needs_teacher_check,
+            })
 
         return existing_solutions, solved_numbers
 
@@ -143,21 +123,17 @@ def upsert_paper_record(
     paper_id: str,
     fingerprint: str,
     status: str = "solving",
-    subject: str | None = None,
-    class_name: str | None = None,
+    subject: Optional[str] = None,
+    class_name: Optional[str] = None,
     board: str = "CBSE",
     total_questions: int = 0,
     total_marks: int = 0,
-    sections: list[str] | None = None,
-    source_file: str | None = None,
+    sections: Optional[List[str]] = None,
+    source_file: Optional[str] = None,
 ) -> None:
-    """Insert or update the paper record when ingestion starts."""
+    """Inserts or updates the paper record when ingestion starts."""
     with get_db_session() as session:
-        paper = (
-            session.query(PaperTable)
-            .filter(PaperTable.paper_id == paper_id)
-            .first()
-        )
+        paper = session.query(PaperTable).filter(PaperTable.paper_id == paper_id).first()
 
         if paper:
             paper.status = status
@@ -193,13 +169,9 @@ def upsert_paper_record(
 
 
 def mark_paper_status(paper_id: str, status: str) -> None:
-    """Update the status of a paper (e.g. 'ready' or 'failed')."""
+    """Updates the status of a paper (e.g. 'ready' or 'failed')."""
     with get_db_session() as session:
-        paper = (
-            session.query(PaperTable)
-            .filter(PaperTable.paper_id == paper_id)
-            .first()
-        )
+        paper = session.query(PaperTable).filter(PaperTable.paper_id == paper_id).first()
         if paper:
             paper.status = status
             paper.updated_at = func.now()
