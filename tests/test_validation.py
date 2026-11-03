@@ -10,8 +10,6 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from app.ingestion.errors import ValidationError  # noqa: E402
 from app.ingestion.validation import (  # noqa: E402
     raise_if_invalid,

@@ -15,10 +15,10 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+
+import pytest
 
 from app.ingestion.errors import DocumentError  # noqa: E402
 from app.ingestion.paper_loader import (  # noqa: E402

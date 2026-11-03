@@ -31,21 +31,28 @@ def save_question_checkpoint(
 
     with get_db_session() as session:
         # Check if this question was already saved for this paper
-        existing_row = (
-            session.query(SolvedQuestionTable)
-            .filter(
-                SolvedQuestionTable.paper_id == paper_id,
-                SolvedQuestionTable.question_number == q_num,
-            )
-            .first()
-        )
+        work_item_id = question_item.get("work_item_id")
+        query = session.query(SolvedQuestionTable).filter(SolvedQuestionTable.paper_id == paper_id)
+        if work_item_id:
+            query = query.filter(SolvedQuestionTable.work_item_id == str(work_item_id))
+        else:
+            # Compatibility path for callers that have not yet adopted work_item_id.
+            query = query.filter(SolvedQuestionTable.question_number == q_num)
+        existing_row = query.first()
 
         if existing_row:
             # Update existing row
             existing_row.question_signature = signature
+            existing_row.work_item_id = str(work_item_id) if work_item_id else existing_row.work_item_id
+            existing_row.question_index = question_item.get("question_index")
+            existing_row.provider_used = question_item.get("provider_used")
+            existing_row.model_used = question_item.get("model_used")
+            existing_row.prompt_version = (question_item.get("selected_route") or {}).get("prompt_version")
+            existing_row.verification_status = (question_item.get("verification") or {}).get("status")
+            existing_row.verification_reasons = (question_item.get("verification") or {}).get("reasons", [])
             existing_row.section = question_item.get("section")
             existing_row.question_text = question_item.get("text", "")
-            existing_row.marks = int(question_item.get("marks", 1))
+            existing_row.marks = int(question_item.get("marks") or 0)
             existing_row.question_type = question_item.get("type")
             existing_row.options = question_item.get("options")
             existing_row.has_figure = bool(question_item.get("has_figure", False))
@@ -54,18 +61,25 @@ def save_question_checkpoint(
             existing_row.steps = solution_contract.get("steps", [])
             existing_row.mark_split = solution_contract.get("mark_split", [])
             existing_row.common_mistakes = solution_contract.get("common_mistakes", [])
-            existing_row.confidence = float(solution_contract.get("confidence", 1.0))
+            existing_row.confidence = float(solution_contract.get("confidence", 0.0))
             existing_row.verified_by = solution_contract.get("verified_by", "groq")
-            existing_row.needs_teacher_check = bool(solution_contract.get("needs_teacher_check", False))
+            existing_row.needs_teacher_check = bool(solution_contract.get("needs_teacher_check", True))
         else:
             # Create new row
             new_row = SolvedQuestionTable(
                 paper_id=paper_id,
                 question_signature=signature,
                 question_number=q_num,
+                work_item_id=str(work_item_id) if work_item_id else None,
+                question_index=question_item.get("question_index"),
+                provider_used=question_item.get("provider_used"),
+                model_used=question_item.get("model_used"),
+                prompt_version=(question_item.get("selected_route") or {}).get("prompt_version"),
+                verification_status=(question_item.get("verification") or {}).get("status"),
+                verification_reasons=(question_item.get("verification") or {}).get("reasons", []),
                 section=question_item.get("section"),
                 question_text=question_item.get("text", ""),
-                marks=int(question_item.get("marks", 1)),
+                marks=int(question_item.get("marks") or 0),
                 question_type=question_item.get("type"),
                 options=question_item.get("options"),
                 has_figure=bool(question_item.get("has_figure", False)),
@@ -73,9 +87,9 @@ def save_question_checkpoint(
                 steps=solution_contract.get("steps", []),
                 mark_split=solution_contract.get("mark_split", []),
                 common_mistakes=solution_contract.get("common_mistakes", []),
-                confidence=float(solution_contract.get("confidence", 1.0)),
+                confidence=float(solution_contract.get("confidence", 0.0)),
                 verified_by=solution_contract.get("verified_by", "groq"),
-                needs_teacher_check=bool(solution_contract.get("needs_teacher_check", False)),
+                needs_teacher_check=bool(solution_contract.get("needs_teacher_check", True)),
             )
             session.add(new_row)
 

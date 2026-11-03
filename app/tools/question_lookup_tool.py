@@ -27,23 +27,19 @@ def lookup_cached_question(
         return None
 
     with get_db_session() as session:
-        # Fetch the most confident verified answer with this signature
+        # Only reuse rows explicitly marked as not requiring teacher review.
+        # A signature match is a candidate match, not independent proof of correctness.
         cached_row = (
             session.query(SolvedQuestionTable)
             .filter(SolvedQuestionTable.question_signature == signature)
-            .filter(SolvedQuestionTable.needs_teacher_check == False)  # Prefer verified answers
+            .filter(SolvedQuestionTable.needs_teacher_check.is_(False))
+            .filter(SolvedQuestionTable.verification_status == "passed")
+            .filter(SolvedQuestionTable.model_used.is_not(None))
+            .filter(SolvedQuestionTable.prompt_version.is_not(None))
+            .filter(SolvedQuestionTable.confidence.is_not(None))
             .order_by(SolvedQuestionTable.confidence.desc(), SolvedQuestionTable.id.desc())
             .first()
         )
-
-        # Fallback: if only rows with needs_teacher_check exist, grab the best one
-        if not cached_row:
-            cached_row = (
-                session.query(SolvedQuestionTable)
-                .filter(SolvedQuestionTable.question_signature == signature)
-                .order_by(SolvedQuestionTable.confidence.desc(), SolvedQuestionTable.id.desc())
-                .first()
-            )
 
         if not cached_row:
             return None
@@ -56,7 +52,10 @@ def lookup_cached_question(
             "steps": cached_row.steps or [],
             "mark_split": cached_row.mark_split or [],
             "common_mistakes": cached_row.common_mistakes or [],
-            "confidence": float(cached_row.confidence or 0.95),
+            "confidence": float(cached_row.confidence if cached_row.confidence is not None else 0.0),
             "verified_by": f"cache:signature:{cached_row.verified_by or 'db'}",
             "needs_teacher_check": cached_row.needs_teacher_check,
+            "verification_status": cached_row.verification_status,
+            "model_used": cached_row.model_used,
+            "prompt_version": cached_row.prompt_version,
         }

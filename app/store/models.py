@@ -16,6 +16,7 @@ from sqlalchemy import (
     JSON,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -56,6 +57,7 @@ class SolvedQuestionTable(Base):
     """Stores individual solved question solutions, signatures, and verification attributes."""
 
     __tablename__ = "solved_questions"
+    __table_args__ = (UniqueConstraint("paper_id", "work_item_id", name="uq_solved_question_work_item"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     paper_id: Mapped[str] = mapped_column(
@@ -63,6 +65,14 @@ class SolvedQuestionTable(Base):
     )
     question_signature: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     question_number: Mapped[str] = mapped_column(String(20), nullable=False)
+    # Added for reliable resume/upsert when display question numbers repeat by section.
+    work_item_id: Mapped[Optional[str]] = mapped_column(String(160), nullable=True)
+    question_index: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    provider_used: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
+    model_used: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+    prompt_version: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
+    verification_status: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+    verification_reasons: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
     section: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     question_text: Mapped[str] = mapped_column(Text, nullable=False)
     marks: Mapped[int] = mapped_column(Integer, nullable=False)

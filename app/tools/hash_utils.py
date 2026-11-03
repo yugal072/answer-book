@@ -5,14 +5,15 @@ Provides deterministic SHA-256 fingerprinting for:
 2. Question-level composite signature caching (text + marks + board + class_name).
 """
 
+from __future__ import annotations
+
 import hashlib
-import re
 from pathlib import Path
-from typing import Union
+import re
 
 
 def normalize_text(text: str) -> str:
-    """Normalizes question text to ensure deterministic hashing across minor variations.
+    """Normalize question text to ensure deterministic hashing across minor variations.
 
     Transformations:
     - Lowercases all characters.
@@ -51,25 +52,29 @@ def normalize_text(text: str) -> str:
     return t
 
 
-def generate_paper_fingerprint(source: Union[bytes, str, Path]) -> str:
-    """Generates a SHA-256 fingerprint of the raw paper file.
+def generate_paper_fingerprint(source: bytes | str | Path) -> str:
+    """Generate a SHA-256 fingerprint of the raw paper file.
 
     Args:
         source: Raw file bytes, or a Path/str pointing to the paper file on disk.
 
     Returns:
-        str: 64-character lowercase hexadecimal SHA-256 string.
+        64-character lowercase hexadecimal SHA-256 string.
     """
     if isinstance(source, bytes):
         raw_bytes = source
     elif isinstance(source, (str, Path)):
         path = Path(source)
         if not path.is_file():
-            raise FileNotFoundError(f"Cannot generate fingerprint: file not found at {path}")
+            raise FileNotFoundError(
+                f"Cannot generate fingerprint: file not found at {path}"
+            )
         with open(path, "rb") as f:
             raw_bytes = f.read()
     else:
-        raise TypeError(f"Unsupported source type for fingerprint generation: {type(source)}")
+        raise TypeError(
+            f"Unsupported source type for fingerprint generation: {type(source)}"
+        )
 
     return hashlib.sha256(raw_bytes).hexdigest()
 
@@ -79,11 +84,16 @@ def generate_question_signature(
     marks: int,
     board: str = "CBSE",
     class_name: str = "",
+    *,
+    options: list[str] | None = None,
+    has_figure: bool = False,
+    subject: str = "",
 ) -> str:
-    """Generates a deterministic composite signature for question-level caching.
+    """Generate a deterministic composite signature for question-level caching.
 
-    Formula:
-        Signature = SHA-256(normalized_text | marks | board | class_name)
+    Formula (v2): SHA-256(version | normalized text | marks | board | class | subject | options | figure flag).
+    Optional context fields prevent reusing an MCQ answer when its options differ,
+    or reusing an answer when the question explicitly depends on a figure.
 
     Rationale:
         - Includes marks: Prevents the "marks blindness" bug where a 2-mark brief definition
@@ -94,6 +104,13 @@ def generate_question_signature(
     norm_text = normalize_text(question_text)
     norm_board = (board or "CBSE").strip().upper()
     norm_class = (class_name or "").strip().lower()
+    norm_subject = (subject or "").strip().lower()
+    norm_options = "\u241f".join(
+        normalize_text(option) for option in (options or [])
+    )
 
-    composite_key = f"{norm_text}|{marks}|{norm_board}|{norm_class}"
+    composite_key = (
+        f"v2|{norm_text}|{marks}|{norm_board}|{norm_class}|{norm_subject}|"
+        f"{norm_options}|figure={int(bool(has_figure))}"
+    )
     return hashlib.sha256(composite_key.encode("utf-8")).hexdigest()

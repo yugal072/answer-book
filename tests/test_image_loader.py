@@ -18,9 +18,6 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-
 from app.ingestion import image_loader as il  # noqa: E402
 from app.models.loaders_models import Paper, Question  # noqa: E402
 
